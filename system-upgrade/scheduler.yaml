@@ -36,7 +36,7 @@ metadata:
   namespace: system-upgrade
 spec:
   schedule: "0 5 * * 0"
-  timeZone: Europe/Warsaw
+  timeZone: Europe/Berlin
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
@@ -70,7 +70,7 @@ metadata:
   namespace: system-upgrade
 spec:
   schedule: "0 6 * * 0"
-  timeZone: Europe/Warsaw
+  timeZone: Europe/Berlin
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
