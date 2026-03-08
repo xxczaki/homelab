@@ -1,0 +1,26 @@
+name: Update README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "scripts/generate-apps-table.sh"
+
+jobs:
+  update-apps-table:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate applications table
+        run: |
+          chmod +x scripts/generate-apps-table.sh
+          ./scripts/generate-apps-table.sh
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: update applications table in readme"
+          file_pattern: readme.md
