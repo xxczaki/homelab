@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/xxczaki/homelab
+    targetRevision: HEAD
+    path: apps
+    directory:
+      recurse: true
+      exclude: "{**/resources/**}"
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: argo-cd
+  syncPolicy:
+    automated:
+      selfHeal: true
