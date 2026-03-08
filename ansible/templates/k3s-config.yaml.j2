@@ -1,0 +1,32 @@
+node-ip: {{ k3s_node_ip }}
+tls-san: {{ k3s_tls_san }}
+cluster-cidr:
+{% for cidr in k3s_cluster_cidrs %}
+  - {{ cidr }}
+{% endfor %}
+service-cidr:
+{% for cidr in k3s_service_cidrs %}
+  - {{ cidr }}
+{% endfor %}
+flannel-backend: none
+disable-network-policy: true
+disable-kube-proxy: true
+disable:
+  - traefik
+  - servicelb
+  - local-storage
+cluster-init: true
+protect-kernel-defaults: true
+secrets-encryption: true
+kube-apiserver-arg:
+{% for arg in k3s_apiserver_args %}
+  - '{{ arg }}'
+{% endfor %}
+kube-controller-manager-arg:
+{% for arg in k3s_controller_manager_args %}
+  - '{{ arg }}'
+{% endfor %}
+kubelet-arg:
+{% for arg in k3s_kubelet_args %}
+  - '{{ arg }}'
+{% endfor %}

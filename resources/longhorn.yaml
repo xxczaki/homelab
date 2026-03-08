@@ -13,6 +13,8 @@ spec:
         valuesObject:
           defaultSettings:
             allowCollectingLonghornUsageMetrics: false
+            backupTarget: s3://homelab-xxczaki-longhorn-backups@eu-central-003/
+            backupTargetCredentialSecret: longhorn-backblaze-b2
 
           preUpgradeChecker:
             jobEnabled: false

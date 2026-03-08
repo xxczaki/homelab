@@ -1,0 +1,121 @@
+- name: Configure k3s node
+  hosts: raspberrypi
+  become: true
+  vars:
+    # --- Network ---
+    k3s_node_ip: "10.10.10.10,fe80::c196:2a41:e1c0:79d7"
+    k3s_tls_san: "100.67.31.43"
+    k3s_cluster_cidrs:
+      - "10.42.0.0/16"
+      - "2001:cafe:42::/56"
+    k3s_service_cidrs:
+      - "10.43.0.0/16"
+      - "2001:cafe:43::/112"
+
+    # --- API Server ---
+    k3s_apiserver_args:
+      - "enable-admission-plugins=NodeRestriction"
+      - "admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml"
+
+    # --- Controller Manager ---
+    k3s_controller_manager_args:
+      - "terminated-pod-gc-threshold=10"
+
+    # --- Kubelet ---
+    k3s_kubelet_args:
+      - "streaming-connection-idle-timeout=5m"
+      - "tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+      - "image-gc-high-threshold=60"
+      - "image-gc-low-threshold=40"
+
+    # --- Pod Security Admission ---
+    psa_default_level: "restricted"
+    psa_exempt_namespaces:
+      - kube-system
+      - pi-hole
+      - tailscale
+      - monitoring
+      - longhorn
+      - default
+      - cilium-test-1
+
+    # --- Sysctl: kubelet requirements (protect-kernel-defaults) ---
+    sysctl_kubelet:
+      vm.panic_on_oom: 0
+      vm.overcommit_memory: 1
+      kernel.panic: 10
+      kernel.panic_on_oops: 1
+
+    # --- Sysctl: kubernetes extras ---
+    sysctl_kubernetes:
+      fs.inotify.max_user_watches: 524288
+      fs.inotify.max_user_instances: 512
+
+    # --- Boot ---
+    boot_cmdline: "console=serial0,115200 console=tty1 root=PARTUUID=3e6aa092-02 rootfstype=ext4 fsck.repair=yes rootwait cgroup_memory=1 cgroup_enable=memory cfg80211.ieee80211_regdom=PL"
+
+  tasks:
+    - name: Create k3s config directory
+      ansible.builtin.file:
+        path: /etc/rancher/k3s
+        state: directory
+        mode: "0755"
+
+    - name: Deploy k3s config
+      ansible.builtin.template:
+        src: templates/k3s-config.yaml.j2
+        dest: /etc/rancher/k3s/config.yaml
+        mode: "0644"
+      notify: restart k3s
+
+    - name: Deploy Pod Security Admission config
+      ansible.builtin.template:
+        src: templates/psa.yaml.j2
+        dest: /var/lib/rancher/k3s/server/psa.yaml
+        mode: "0644"
+      notify: restart k3s
+
+    - name: Deploy kubelet sysctl config
+      ansible.builtin.template:
+        src: templates/sysctl-kubelet.conf.j2
+        dest: /etc/sysctl.d/90-kubelet.conf
+        mode: "0644"
+      notify: reload sysctl
+
+    - name: Deploy kubernetes sysctl config
+      ansible.builtin.template:
+        src: templates/sysctl-kubernetes.conf.j2
+        dest: /etc/sysctl.d/91-kubernetes.conf
+        mode: "0644"
+      notify: reload sysctl
+
+    - name: Deploy boot cmdline
+      ansible.builtin.template:
+        src: templates/cmdline.txt.j2
+        dest: /boot/firmware/cmdline.txt
+        mode: "0755"
+      notify: reboot required
+
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_flag
+
+    - name: Print reboot notice
+      ansible.builtin.debug:
+        msg: "Boot cmdline changed – a reboot is required for changes to take effect."
+      when: reboot_needed is defined and reboot_needed
+
+  handlers:
+    - name: restart k3s
+      ansible.builtin.systemd:
+        name: k3s
+        state: restarted
+
+    - name: reload sysctl
+      ansible.builtin.command:
+        cmd: sysctl --system
+
+    - name: reboot required
+      ansible.builtin.set_fact:
+        reboot_needed: true
