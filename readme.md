@@ -40,21 +40,21 @@ Single-node [K3s](https://k3s.io) cluster managed entirely through [Argo CD](htt
 
 ```
 .
-├── apps/                    # Argo CD application manifests
+├── apps/                        # Argo CD application manifests
 │   └── <app>/
 │       ├── application.yaml     # Argo CD Application resource
 │       ├── secret.yaml          # Sealed Secret (if needed)
 │       └── resources/           # Additional resources (if needed)
-├── ansible/                 # Node provisioning playbooks
+├── ansible/                     # Node provisioning playbooks
 │   ├── playbook.yml
 │   ├── inventory.yml
 │   └── templates/
-├── scripts/                 # Utility scripts
+├── scripts/                     # Utility scripts
 │   ├── seal-secrets.sh
 │   ├── extract-secrets.sh
 │   └── generate-apps-table.sh
-├── secrets/                 # Raw secrets (git-ignored)
-└── root-application.yaml    # Root Argo CD Application
+├── secrets/                     # Raw secrets (git-ignored)
+└── root-application.yaml        # Root Argo CD Application
 ```
 
 ## Getting started
