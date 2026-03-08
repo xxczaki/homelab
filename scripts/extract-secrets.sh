@@ -135,9 +135,9 @@ parse_sealed_secret() {
     # Extract filename from path
     local filename
     filename=$(basename "$sealed_file")
-    
+
     echo "    🔍 Found: $secret_name in namespace $namespace"
-    
+
     if extract_secret "$secret_name" "$namespace" "$filename"; then
         ((extracted_count++))
     else
@@ -148,7 +148,7 @@ parse_sealed_secret() {
 # Auto-discover all sealed secret files
 echo "🔍 Auto-discovering sealed secrets..."
 total_files=0
-for sealed_file in resources/*-secret.yaml; do
+for sealed_file in resources/*-secret.yaml openclaw/*secret*.yaml; do
     if [[ -f "$sealed_file" ]]; then
         ((total_files++))
         parse_sealed_secret "$sealed_file" || true  # Continue even if one fails
@@ -156,7 +156,7 @@ for sealed_file in resources/*-secret.yaml; do
 done
 
 if [[ $total_files -eq 0 ]]; then
-    echo "❌ No sealed secret files found in resources/ directory"
+    echo "❌ No sealed secret files found"
     exit 1
 fi
 

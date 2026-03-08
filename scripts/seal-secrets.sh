@@ -8,9 +8,24 @@ fi
 
 sealed_no=0
 
+# Seal secrets destined for resources/
 for path in secrets/*.yaml; do
-  kubeseal -f $path -w resources/$(basename $path)
-	((sealed_no++))
+  [[ -f "$path" ]] || continue
+  filename=$(basename "$path")
+
+  # OpenClaw secrets go to openclaw/, not resources/
+  case "$filename" in
+    api-keys-secret.yaml)
+      kubeseal -f "$path" -w openclaw/api-keys-secret.yaml
+      ;;
+    ha-ssh-sealed-secret.yaml)
+      kubeseal -f "$path" -w openclaw/ha-ssh-sealed-secret.yaml
+      ;;
+    *)
+      kubeseal -f "$path" -w "resources/$filename"
+      ;;
+  esac
+  ((sealed_no++))
 done
 
 echo "Successfully sealed $sealed_no file(s)"
