@@ -38,6 +38,7 @@
       - longhorn
       - default
       - cilium-test-1
+      - system-upgrade
 
     # --- Sysctl: kubelet requirements (protect-kernel-defaults) ---
     sysctl_kubelet:
