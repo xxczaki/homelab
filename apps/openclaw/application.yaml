@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/xxczaki/homelab
     targetRevision: main
-    path: openclaw
+    path: apps/openclaw/resources
   destination:
     server: "https://kubernetes.default.svc"
     namespace: openclaw-system

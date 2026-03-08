@@ -132,9 +132,9 @@ parse_sealed_secret() {
         return 1
     fi
     
-    # Extract filename from path
+    # Use mapped original filename, or fall back to basename
     local filename
-    filename=$(basename "$sealed_file")
+    filename="${sealed_to_secret[$sealed_file]:-$(basename "$sealed_file")}"
 
     echo "    🔍 Found: $secret_name in namespace $namespace"
 
@@ -145,12 +145,30 @@ parse_sealed_secret() {
     fi
 }
 
+# Map sealed secret files to their original secret filenames
+declare -A sealed_to_secret=(
+  [apps/argo-cd/secret.yaml]="argo-cd-secret.yaml"
+  [apps/discord-bot/secret.yaml]="discord-bot-secret.yaml"
+  [apps/k8s-monitoring/logs-secret.yaml]="logs-grafana-k8s-monitoring-secret.yaml"
+  [apps/k8s-monitoring/metrics-secret.yaml]="metrics-grafana-k8s-monitoring-secret.yaml"
+  [apps/k8s-monitoring/traces-secret.yaml]="traces-grafana-k8s-monitoring-secret.yaml"
+  [apps/longhorn/backblaze-b2-secret.yaml]="longhorn-backblaze-b2-secret.yaml"
+  [apps/tailscale/oauth-secret.yaml]="tailscale-operator-oauth-secret.yaml"
+  [apps/openclaw/resources/api-keys-secret.yaml]="api-keys-secret.yaml"
+  [apps/openclaw/resources/ha-ssh-sealed-secret.yaml]="ha-ssh-sealed-secret.yaml"
+)
+
 # Auto-discover all sealed secret files
 echo "🔍 Auto-discovering sealed secrets..."
 total_files=0
-for sealed_file in resources/*-secret.yaml openclaw/*secret*.yaml; do
+for sealed_file in "${!sealed_to_secret[@]}"; do
     if [[ -f "$sealed_file" ]]; then
         ((total_files++))
+    fi
+done
+
+for sealed_file in "${!sealed_to_secret[@]}"; do
+    if [[ -f "$sealed_file" ]]; then
         parse_sealed_secret "$sealed_file" || true  # Continue even if one fails
     fi
 done
