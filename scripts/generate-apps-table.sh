@@ -42,6 +42,12 @@ get_version() {
 		fi
 	fi
 
+	# Ensure version starts with "v"
+	if [ -n "$ver" ] && [ "$ver" != "-" ]; then
+		ver="${ver#v}"
+		ver="v$ver"
+	fi
+
 	echo "${ver:--}"
 }
 
