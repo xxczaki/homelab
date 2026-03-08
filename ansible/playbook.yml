@@ -1,4 +1,4 @@
-- name: Configure k3s node
+- name: Configure K3s node
   hosts: raspberrypi
   become: true
   vars:
@@ -56,25 +56,25 @@
     boot_cmdline: "console=serial0,115200 console=tty1 root=PARTUUID=3e6aa092-02 rootfstype=ext4 fsck.repair=yes rootwait cgroup_memory=1 cgroup_enable=memory cfg80211.ieee80211_regdom=PL"
 
   tasks:
-    - name: Create k3s config directory
+    - name: Create K3s config directory
       ansible.builtin.file:
         path: /etc/rancher/k3s
         state: directory
         mode: "0755"
 
-    - name: Deploy k3s config
+    - name: Deploy K3s config
       ansible.builtin.template:
         src: templates/k3s-config.yaml.j2
         dest: /etc/rancher/k3s/config.yaml
         mode: "0644"
-      notify: restart k3s
+      notify: restart K3s
 
     - name: Deploy Pod Security Admission config
       ansible.builtin.template:
         src: templates/psa.yaml.j2
         dest: /var/lib/rancher/k3s/server/psa.yaml
         mode: "0644"
-      notify: restart k3s
+      notify: restart K3s
 
     - name: Deploy kubelet sysctl config
       ansible.builtin.template:
@@ -108,7 +108,7 @@
       when: reboot_needed is defined and reboot_needed
 
   handlers:
-    - name: restart k3s
+    - name: restart K3s
       ansible.builtin.systemd:
         name: k3s
         state: restarted
