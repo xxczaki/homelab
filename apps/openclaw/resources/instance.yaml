@@ -62,6 +62,13 @@ spec:
           ports:
             - port: 22
               protocol: TCP
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: kube-system
+          ports:
+            - port: 8080
+              protocol: TCP
   networking:
     ingress:
       enabled: true
@@ -89,6 +96,9 @@ spec:
     - name: extra-bin
       mountPath: /usr/local/bin/gh
       subPath: gh
+    - name: extra-bin
+      mountPath: /usr/local/bin/kubeseal
+      subPath: kubeseal
     - name: claude-code
       mountPath: /opt/claude-code
     - name: home
@@ -100,6 +110,26 @@ spec:
     - name: PATH
       value: "/opt/claude-code/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   initContainers:
+    - name: install-kubeseal
+      image: alpine:3.21
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          wget -qO /tmp/kubeseal.tar.gz https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.29.0/kubeseal-0.29.0-linux-arm64.tar.gz &&
+          tar -xzf /tmp/kubeseal.tar.gz -C /tmp &&
+          cp /tmp/kubeseal /extra-bin/kubeseal &&
+          chmod +x /extra-bin/kubeseal
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumeMounts:
+        - name: extra-bin
+          mountPath: /extra-bin
     - name: install-gh
       image: alpine:3.21
       command: ["/bin/sh", "-c"]
