@@ -168,6 +168,56 @@ spec:
       volumeMounts:
         - name: claude-code
           mountPath: /opt/claude-code
+    - name: setup-claude-code-config
+      image: node:24-slim
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          mkdir -p /home/openclaw/.claude
+          cat > /home/openclaw/.claude/.config.json << 'CONF'
+          {
+            "theme": "dark",
+            "hasCompletedOnboarding": true,
+            "customApiKeyResponses": {
+              "approved": [],
+              "rejected": []
+            },
+            "projects": {
+              "/": { "hasTrustDialogAccepted": true },
+              "/tmp": { "hasTrustDialogAccepted": true },
+              "/home/openclaw": { "hasTrustDialogAccepted": true }
+            }
+          }
+          CONF
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            KEY_SUFFIX=$(echo -n "$ANTHROPIC_API_KEY" | tail -c 20)
+            node -e "
+              const fs = require('fs');
+              const cfg = JSON.parse(fs.readFileSync('/home/openclaw/.claude/.config.json', 'utf8'));
+              cfg.customApiKeyResponses.rejected = ['${KEY_SUFFIX}'];
+              fs.writeFileSync('/home/openclaw/.claude/.config.json', JSON.stringify(cfg, null, 2));
+            "
+          fi
+          cat > /home/openclaw/.claude/settings.json << 'CONF'
+          {
+            "skipDangerousModePermissionPrompt": true
+          }
+          CONF
+          echo "Claude Code config seeded."
+      envFrom:
+        - secretRef:
+            name: openclaw-api-keys
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumeMounts:
+        - name: home
+          mountPath: /home/openclaw
   chromium:
     enabled: true
     resources:
