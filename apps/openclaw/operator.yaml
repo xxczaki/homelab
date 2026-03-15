@@ -8,7 +8,7 @@ spec:
   source:
     chart: openclaw-operator
     repoURL: ghcr.io/openclaw-rocks/charts
-    targetRevision: 0.18.0
+    targetRevision: 0.18.1
   destination:
     server: "https://kubernetes.default.svc"
     namespace: openclaw-system
