@@ -16,6 +16,14 @@ spec:
             backupTarget: s3://homelab-xxczaki-longhorn-backups@eu-central-003/
             backupTargetCredentialSecret: longhorn-backblaze-b2
 
+          longhornManager:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
           preUpgradeChecker:
             jobEnabled: false
 

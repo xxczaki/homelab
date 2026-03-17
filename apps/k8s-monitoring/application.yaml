@@ -69,10 +69,31 @@ spec:
                     - alloy-logs
         alloy-metrics:
           enabled: true
+          alloy:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
         alloy-singleton:
           enabled: true
+          alloy:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
         alloy-logs:
           enabled: true
+          alloy:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
   destination:
     server: "https://kubernetes.default.svc"
     namespace: monitoring
