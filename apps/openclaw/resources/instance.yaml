@@ -220,6 +220,9 @@ spec:
           mountPath: /home/openclaw
   chromium:
     enabled: true
+    image:
+      repository: chromedp/headless-shell
+      tag: stable
     resources:
       requests:
         cpu: "250m"
