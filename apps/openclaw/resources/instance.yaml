@@ -13,7 +13,7 @@ spec:
       - "http://localhost:18789"
       - "http://127.0.0.1:18789"
   config:
-    mergeMode: overwrite
+    mergeMode: merge
     raw:
       gateway:
         trustedProxies:
@@ -112,6 +112,30 @@ spec:
     - name: PATH
       value: "/opt/claude-code/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   initContainers:
+    - name: cleanup-clobbered-configs
+      image: alpine:3.21
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Cleaning up clobbered config files..."
+          COUNT=$(find /data -maxdepth 1 -name "openclaw.json.clobbered*" | wc -l)
+          if [ "$COUNT" -gt 0 ]; then
+            find /data -maxdepth 1 -name "openclaw.json.clobbered*" -delete
+            echo "Deleted $COUNT clobbered config files."
+          else
+            echo "No clobbered files found."
+          fi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumeMounts:
+        - name: data
+          mountPath: /data
     - name: install-kubeseal
       image: alpine:3.21
       command: ["/bin/sh", "-c"]
