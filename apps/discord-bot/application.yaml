@@ -8,7 +8,7 @@ spec:
   source:
     chart: discord-bot
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.17.44
+    targetRevision: 0.19.0
     helm:
       valuesObject:
         secrets:
@@ -31,6 +31,7 @@ spec:
           botDebugChannelId: "1378037693094694922"
           ownerUserId: "349213466743013376"
           spotifyClientId: "cb115f7736cd45c9a7e8ae4555fa0f83"
+          fallbackSource: "youtube"
 
         persistentVolumeClaim:
           storageClass: longhorn
