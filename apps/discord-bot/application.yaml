@@ -31,7 +31,7 @@ spec:
           botDebugChannelId: "1378037693094694922"
           ownerUserId: "349213466743013376"
           spotifyClientId: "cb115f7736cd45c9a7e8ae4555fa0f83"
-          fallbackSource: "youtube"
+          enableYoutube: "true"
 
         persistentVolumeClaim:
           storageClass: longhorn
