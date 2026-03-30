@@ -4,6 +4,8 @@ metadata:
   name: openclaw
   namespace: openclaw-system
 spec:
+  image:
+    tag: "2026.3.23-2"
   envFrom:
     - secretRef:
         name: openclaw-api-keys
@@ -13,7 +15,7 @@ spec:
       - "http://localhost:18789"
       - "http://127.0.0.1:18789"
   config:
-    mergeMode: merge
+    mergeMode: overwrite
     raw:
       gateway:
         trustedProxies:
@@ -38,11 +40,7 @@ spec:
       enabled: true
       size: 10Gi
   autoUpdate:
-    enabled: true
-    checkInterval: "24h"
-    backupBeforeUpdate: false
-    rollbackOnFailure: true
-    healthCheckTimeout: "10m"
+    enabled: false
   selfConfigure:
     enabled: false
   observability:
