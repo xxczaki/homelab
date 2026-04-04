@@ -14,6 +14,9 @@ spec:
         cluster:
           name: "homelab"
 
+        global:
+          scrapeInterval: 120s
+
         destinations:
           Metrics:
             type: prometheus
@@ -47,18 +50,39 @@ spec:
         clusterMetrics:
           enabled: true
           collector: alloy-metrics
+          kube-state-metrics:
+            namespacesDenylist:
+              - monitoring
+              - kube-system
+              - longhorn-system
+          cadvisor:
+            metricsTuning:
+              dropEmptyContainerLabels: true
+              dropEmptyImageLabels: true
+              excludeNamespaces:
+                - monitoring
+                - kube-system
+                - longhorn-system
         prometheusOperatorObjects:
           enabled: true
           collector: alloy-singleton
         clusterEvents:
           enabled: true
           collector: alloy-singleton
+          excludeNamespaces:
+            - monitoring
+            - kube-system
+            - longhorn-system
         nodeLogs:
           enabled: true
           collector: alloy-logs
         podLogsViaLoki:
           enabled: true
           collector: alloy-logs
+          excludeNamespaces:
+            - monitoring
+            - kube-system
+            - longhorn-system
         hostMetrics:
           enabled: true
           collector: alloy-metrics
@@ -98,6 +122,20 @@ spec:
           alloy-singleton:
             presets:
               - singleton
+            extraConfig: |
+              remote.kubernetes.secret "metrics" {
+                name      = "metrics-grafana-k8s-monitoring"
+                namespace = "monitoring"
+              }
+
+              mimir.rules.kubernetes "rules" {
+                address = "https://prometheus-prod-39-prod-eu-north-0.grafana.net"
+
+                basic_auth {
+                  username = nonsensitive(remote.kubernetes.secret.metrics.data["username"])
+                  password = remote.kubernetes.secret.metrics.data["password"]
+                }
+              }
             alloy:
               resources:
                 requests:
