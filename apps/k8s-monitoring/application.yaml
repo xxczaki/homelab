@@ -8,28 +8,28 @@ spec:
   source:
     chart: k8s-monitoring
     repoURL: https://grafana.github.io/helm-charts
-    targetRevision: 3.8.5
+    targetRevision: 4.0.0
     helm:
       valuesObject:
         cluster:
           name: "homelab"
 
         destinations:
-          - name: Metrics
+          Metrics:
             type: prometheus
             url: https://prometheus-prod-39-prod-eu-north-0.grafana.net/api/prom/push
             secret:
               create: false
             auth:
               type: basic
-          - name: Logs
+          Logs:
             type: loki
             url: https://logs-prod-025.grafana.net/loki/api/v1/push
             secret:
               create: false
             auth:
               type: basic
-          - name: Traces
+          Traces:
             type: otlp
             url: https://tempo-prod-18-prod-eu-north-0.grafana.net:443
             protocol: grpc
@@ -46,18 +46,21 @@ spec:
 
         clusterMetrics:
           enabled: true
-          node-exporter:
-            metricsTuning:
-              includeMetrics:
-                - node_hwmon_temp_celsius
         prometheusOperatorObjects:
           enabled: true
         clusterEvents:
           enabled: true
         nodeLogs:
           enabled: true
-        podLogs:
+        podLogsViaLoki:
           enabled: true
+        hostMetrics:
+          enabled: true
+          linuxHosts:
+            enabled: true
+            metricsTuning:
+              includeMetrics:
+                - node_hwmon_temp_celsius
         integrations:
           alloy:
             instances:
@@ -67,33 +70,46 @@ spec:
                     - alloy-metrics
                     - alloy-singleton
                     - alloy-logs
-        alloy-metrics:
-          enabled: true
-          alloy:
-            resources:
-              requests:
-                cpu: 50m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
-        alloy-singleton:
-          enabled: true
-          alloy:
-            resources:
-              requests:
-                cpu: 50m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
-        alloy-logs:
-          enabled: true
-          alloy:
-            resources:
-              requests:
-                cpu: 50m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
+
+        telemetryServices:
+          kube-state-metrics:
+            deploy: true
+          node-exporter:
+            deploy: true
+
+        collectors:
+          alloy-metrics:
+            presets:
+              - clustered
+              - statefulset
+            alloy:
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+          alloy-singleton:
+            presets:
+              - singleton
+            alloy:
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+          alloy-logs:
+            presets:
+              - filesystem-log-reader
+              - daemonset
+            alloy:
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
   destination:
     server: "https://kubernetes.default.svc"
     namespace: monitoring
