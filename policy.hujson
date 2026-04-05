@@ -1,0 +1,55 @@
+// Tailscale ACL policy — managed via GitOps.
+// Changes are tested on PRs and applied on merge to main.
+{
+	"tagOwners": {
+		"tag:k8s-operator": [],
+		"tag:k8s":          ["tag:k8s-operator"],
+		"tag:ipv6-only":    [],
+		"tag:server":       ["autogroup:admin"],
+	},
+
+	"nodeAttrs": [
+		{
+			"target": ["tag:ipv6-only"],
+			"attr": [
+				"disable-ipv4",
+			],
+		},
+		{
+			// Funnel policy, which lets tailnet members control Funnel
+			// for their own devices.
+			// Learn more at https://tailscale.com/kb/1223/tailscale-funnel/
+			"target": ["autogroup:member", "tag:k8s"],
+			"attr":   ["funnel"],
+		},
+	],
+
+	"acls": [
+		// Allow all connections.
+		{"action": "accept", "src": ["*"], "dst": ["*:*"]},
+	],
+
+	"ssh": [
+		// Allow all users to SSH into their own devices in check mode.
+		{
+			"action": "check",
+			"src":    ["autogroup:member"],
+			"dst":    ["autogroup:self"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
+		// Allow members to SSH into servers.
+		{
+			"action": "accept",
+			"src":    ["autogroup:member"],
+			"dst":    ["tag:server"],
+			"users":  ["xxczaki"],
+		},
+		// Allow k8s workloads (e.g. OpenClaw) to SSH into servers.
+		{
+			"action": "accept",
+			"src":    ["tag:k8s"],
+			"dst":    ["tag:server"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
+	],
+}
