@@ -19,7 +19,7 @@ jobs:
         uses: tailscale/gitops-acl-action@v1
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-client-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
           tailnet: ${{ secrets.TS_TAILNET }}
           action: test
 
@@ -28,6 +28,6 @@ jobs:
         uses: tailscale/gitops-acl-action@v1
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-client-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
           tailnet: ${{ secrets.TS_TAILNET }}
           action: apply
