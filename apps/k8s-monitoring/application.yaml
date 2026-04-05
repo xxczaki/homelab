@@ -123,11 +123,6 @@ spec:
             presets:
               - singleton
             extraConfig: |
-              remote.kubernetes.secret "metrics" {
-                name      = "metrics-grafana-k8s-monitoring"
-                namespace = "monitoring"
-              }
-
               mimir.rules.kubernetes "rules" {
                 address = "https://prometheus-prod-39-prod-eu-north-0.grafana.net"
 
