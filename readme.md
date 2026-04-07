@@ -26,7 +26,7 @@ Single-node [K3s](https://k3s.io) cluster managed entirely through [Argo CD](htt
 | [argo-cd](apps/argo-cd) | Helm | v9.4.17 |
 | [cilium](apps/cilium) | Helm | v1.19.2 |
 | [discord-bot](apps/discord-bot) | Helm | v0.21.4 |
-| [k8s-monitoring](apps/k8s-monitoring) | Helm | v4.0.0 |
+| [k8s-monitoring](apps/k8s-monitoring) | Helm | v4.0.1 |
 | [longhorn](apps/longhorn) | Helm | v1.11.1 |
 | [openclaw](apps/openclaw) | Git | v0.25.2 |
 | [pi-hole](apps/pi-hole) | Helm | v2.35.0 |
