@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wicek-chart
+  namespace: wicek
+spec:
+  project: default
+  source:
+    chart: wicek
+    repoURL: https://xxczaki.github.io/charts/
+    targetRevision: 0.1.*
+    helm:
+      valuesObject:
+        secrets:
+          oauthToken:
+            name: wicek-secrets
+            key: CLAUDE_CODE_OAUTH_TOKEN
+          discordToken:
+            name: wicek-secrets
+            key: DISCORD_BOT_TOKEN
+          grafanaApiKey:
+            name: wicek-secrets
+            key: GRAFANA_API_KEY
+          haSSHKey:
+            name: wicek-ha-ssh-key
+            key: id_ed25519
+        env:
+          clientId: "1479530749354053833"
+          allowedUserIds: "349213466743013376"
+        persistence:
+          storageClass: longhorn
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: wicek
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
