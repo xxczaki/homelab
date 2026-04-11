@@ -29,6 +29,8 @@ spec:
           allowedUserIds: "349213466743013376"
         persistence:
           storageClass: longhorn
+        chromium:
+          enabled: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek

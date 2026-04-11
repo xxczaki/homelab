@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wicek
+  namespace: wicek
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/xxczaki/homelab
+    targetRevision: main
+    path: apps/wicek/resources
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: wicek
+  ignoreDifferences:
+    - group: ""
+      kind: Service
+      name: raspberrypi
+      jsonPointers:
+        - /spec/externalName
+    - group: ""
+      kind: Service
+      name: homeassistant
+      jsonPointers:
+        - /spec/externalName
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
