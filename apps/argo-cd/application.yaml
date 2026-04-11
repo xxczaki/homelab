@@ -14,7 +14,7 @@ spec:
         configs:
           params:
             server.insecure: true
-            application.namespaces: discord-bot, tailscale, pi-hole, monitoring, longhorn, kube-system, openclaw-system, system-upgrade
+            application.namespaces: discord-bot, tailscale, pi-hole, monitoring, longhorn, kube-system, openclaw-system, system-upgrade, wicek
           secret:
             createSecret: false
           cm:
