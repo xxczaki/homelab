@@ -15,6 +15,19 @@ spec:
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argo-cd
+  ignoreDifferences:
+    - group: ""
+      kind: Service
+      namespace: wicek
+      name: raspberrypi
+      jsonPointers:
+        - /spec/externalName
+    - group: ""
+      kind: Service
+      namespace: wicek
+      name: homeassistant
+      jsonPointers:
+        - /spec/externalName
   syncPolicy:
     automated:
       selfHeal: true
