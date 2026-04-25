@@ -1,23 +1,15 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "timezone": "Europe/Berlin",
-  "extends": [
-    "config:recommended"
-  ],
-  "argocd": {
-    "fileMatch": ["apps/.+\\.yaml$"]
-  },
-  "packageRules": [
-    {
-      "description": "Automerge non-major updates",
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    },
-    {
-      "description": "Schedule discord-bot updates between 3 AM and 8 PM",
-      "matchPackageNames": ["discord-bot"],
-      "schedule": ["* 3-20 * * *"]
-    }
-  ],
-  "ignoreTests": true
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["github>xxczaki/renovate-config"],
+	"argocd": {
+		"fileMatch": ["apps/.+\\.yaml$"]
+	},
+	"packageRules": [
+		{
+			"description": "Schedule discord-bot updates between 3 AM and 8 PM",
+			"matchPackageNames": ["discord-bot"],
+			"schedule": ["* 3-20 * * *"]
+		}
+	],
+	"ignoreTests": true
 }
