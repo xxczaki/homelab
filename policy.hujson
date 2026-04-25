@@ -1,4 +1,4 @@
-// Tailscale ACL policy — managed via GitOps.
+// Tailscale ACL policy – managed via GitOps.
 // Changes are tested on PRs and applied on merge to main.
 {
 	"tagOwners": {
