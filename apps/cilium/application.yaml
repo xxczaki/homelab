@@ -20,7 +20,12 @@ spec:
         l2announcements:
           enabled: true
         bpf:
-          masquerade: true
+          # TODO: re-enable once cilium/cilium#45626 is merged and released.
+          # Raspberry Pi OS kernels ship without CONFIG_DEBUG_INFO_BTF, so
+          # vmlinux BTF is missing and the IPv6 SNAT BPF program
+          # (tail_handle_snat_fwd_ipv6) fails verifier load. See cilium/cilium#45224.
+          # Falling back to iptables masquerading until the upstream fix lands.
+          masquerade: false
         kubeProxyReplacement: true
         socketLB:
           hostNamespaceOnly: true
