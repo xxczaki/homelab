@@ -10,5 +10,6 @@ spec:
   externalName: placeholder
   ports:
     - port: 22
+      targetPort: 22
       protocol: TCP
       name: ssh
