@@ -19,12 +19,17 @@ spec:
           enabled: true
         l2announcements:
           enabled: true
+        # Raspberry Pi OS ships a malformed vmlinux BTF (raspberrypi/linux#6622),
+        # which makes the verifier reject tail_handle_snat_fwd_ipv6 in the
+        # bpf_overlay program collection. Disabling the vxlan overlay sidesteps
+        # the broken codepath while preserving IPv6 + kubeProxyReplacement.
+        routingMode: native
+        ipv4NativeRoutingCIDR: 10.42.0.0/24
+        ipv6NativeRoutingCIDR: 2001:cafe:42::/64
         bpf:
-          # TODO: re-enable once cilium/cilium#45626 is merged and released.
-          # Raspberry Pi OS kernels ship without CONFIG_DEBUG_INFO_BTF, so
-          # vmlinux BTF is missing and the IPv6 SNAT BPF program
-          # (tail_handle_snat_fwd_ipv6) fails verifier load. See cilium/cilium#45224.
-          # Falling back to iptables masquerading until the upstream fix lands.
+          # Belt-and-braces: the same BTF bug would also break the IPv6 SNAT
+          # codepath if BPF masquerade were re-enabled. Iptables masquerade
+          # stays until raspberrypi/linux#6622 / cilium/cilium#45626 land.
           masquerade: false
         kubeProxyReplacement: true
         socketLB:
