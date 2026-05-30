@@ -154,8 +154,8 @@ declare -A sealed_to_secret=(
   [apps/k8s-monitoring/traces-secret.yaml]="traces-grafana-k8s-monitoring-secret.yaml"
   [apps/longhorn/backblaze-b2-secret.yaml]="longhorn-backblaze-b2-secret.yaml"
   [apps/tailscale/oauth-secret.yaml]="tailscale-operator-oauth-secret.yaml"
-  [apps/openclaw/resources/api-keys-secret.yaml]="api-keys-secret.yaml"
-  [apps/openclaw/resources/ha-ssh-sealed-secret.yaml]="ha-ssh-sealed-secret.yaml"
+  [apps/wicek/sealed-secret.yaml]="wicek-secret.yaml"
+  [apps/wicek/ha-ssh-sealed-secret.yaml]="wicek-ha-ssh-secret.yaml"
 )
 
 # Auto-discover all sealed secret files

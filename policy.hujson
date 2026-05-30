@@ -44,7 +44,7 @@
 			"dst":    ["tag:server"],
 			"users":  ["xxczaki"],
 		},
-		// Allow k8s workloads (e.g. OpenClaw) to SSH into servers.
+		// Allow k8s workloads (e.g. wicek) to SSH into servers.
 		{
 			"action": "accept",
 			"src":    ["tag:k8s"],

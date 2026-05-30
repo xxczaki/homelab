@@ -10,8 +10,8 @@ sealed_no=0
 
 # Map secret filenames to their sealed output paths
 declare -A secret_map=(
-  [api-keys-secret.yaml]="apps/openclaw/resources/api-keys-secret.yaml"
-  [ha-ssh-sealed-secret.yaml]="apps/openclaw/resources/ha-ssh-sealed-secret.yaml"
+  [wicek-secret.yaml]="apps/wicek/sealed-secret.yaml"
+  [wicek-ha-ssh-secret.yaml]="apps/wicek/ha-ssh-sealed-secret.yaml"
   [argo-cd-secret.yaml]="apps/argo-cd/secret.yaml"
   [discord-bot-secret.yaml]="apps/discord-bot/secret.yaml"
   [logs-grafana-k8s-monitoring-secret.yaml]="apps/k8s-monitoring/logs-secret.yaml"
