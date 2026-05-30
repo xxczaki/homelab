@@ -13,3 +13,7 @@ spec:
       targetPort: 22
       protocol: TCP
       name: ssh
+    - port: 8123
+      targetPort: 8123
+      protocol: TCP
+      name: mcp

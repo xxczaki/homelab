@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.72
+    targetRevision: 0.1.78
     helm:
       valuesObject:
         secrets:
@@ -21,6 +21,9 @@ spec:
           grafanaApiKey:
             name: wicek-secrets
             key: GRAFANA_API_KEY
+          haToken:
+            name: wicek-secrets
+            key: HA_TOKEN
           haSSHKey:
             name: wicek-ha-ssh-key
             key: id_ed25519
