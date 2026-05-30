@@ -24,6 +24,12 @@ spec:
           haToken:
             name: wicek-secrets
             key: HA_TOKEN
+          appleId:
+            name: wicek-secrets
+            key: APPLE_ID
+          appleAppPassword:
+            name: wicek-secrets
+            key: APPLE_APP_PASSWORD
           haSSHKey:
             name: wicek-ha-ssh-key
             key: id_ed25519
