@@ -28,7 +28,7 @@ Single-node [K3s](https://k3s.io) cluster managed entirely through [Argo CD](htt
 | [discord-bot](apps/discord-bot) | Helm | v0.22.0 |
 | [k8s-monitoring](apps/k8s-monitoring) | Helm | v4.1.5 |
 | [longhorn](apps/longhorn) | Helm | v1.12.0 |
-| [pi-hole](apps/pi-hole) | Helm | v2.35.0 |
+| [pi-hole](apps/pi-hole) | Helm | v2.36.0 |
 | [sealed-secrets](apps/sealed-secrets) | Helm | v2.18.6 |
 | [system-upgrade](apps/system-upgrade) | Git + Kustomize | v0.19.2 |
 | [tailscale](apps/tailscale) | Helm | v1.98.4 |
