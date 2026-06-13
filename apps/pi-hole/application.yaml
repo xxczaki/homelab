@@ -81,7 +81,7 @@ spec:
           enabled: false
 
         dualStack:
-          enabled: true
+          enabled: true  # IPv6 DNS served at ULA fd2b:55e1:1a4c:10::53 (see Cilium pi-hole-pool), advertised to LAN via UniFi RDNSS. ULA is ISP-prefix-independent, so it survives Telekom prefix rotation.
 
         extraEnvVars:
           TZ: "Europe/Warsaw"

@@ -5,7 +5,7 @@ metadata:
 spec:
   blocks:
     - cidr: "10.10.10.53/32"
-    - cidr: "fe80::c196:2a41:e1c0:79d7/64"
+    - cidr: "fd2b:55e1:1a4c:10::53/128"  # ULA for Pi-hole IPv6 DNS; L2/NDP-announced on eth0, advertised to LAN clients via UniFi RDNSS
   serviceSelector:
     matchLabels:
       app: pihole
