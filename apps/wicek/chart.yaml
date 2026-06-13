@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.101
+    targetRevision: 0.1.107
     helm:
       valuesObject:
         secrets:
@@ -30,6 +30,12 @@ spec:
           appleAppPassword:
             name: wicek-secrets
             key: APPLE_APP_PASSWORD
+          unifiUsername:
+            name: wicek-secrets
+            key: UNIFI_USERNAME
+          unifiPassword:
+            name: wicek-secrets
+            key: UNIFI_PASSWORD
           haSSHKey:
             name: wicek-ha-ssh-key
             key: id_ed25519
