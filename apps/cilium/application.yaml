@@ -49,6 +49,20 @@ spec:
           ipv6-service-range: "2001:cafe:43::/112"
         operator:
           replicas: 1
+        # Hubble: egress/DNS flow visibility. Used to harvest the real set of
+        # destinations wicek reaches before enforcing an FQDN egress allowlist.
+        # Relay enabled for `hubble observe`; UI disabled to spare RPi memory.
+        hubble:
+          enabled: true
+          relay:
+            enabled: true
+          ui:
+            enabled: false
+          metrics:
+            enabled:
+              - dns:query
+              - drop
+              - flow
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kube-system
