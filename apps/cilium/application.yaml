@@ -63,6 +63,10 @@ spec:
               - dns:query
               - drop
               - flow
+            # Expose a ServiceMonitor so the Grafana Alloy stack
+            # (prometheusOperatorObjects) scrapes hubble metrics into Mimir.
+            serviceMonitor:
+              enabled: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kube-system
