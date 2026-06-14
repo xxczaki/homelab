@@ -17,7 +17,7 @@ spec:
     # (cilium/cilium#45224). Cilium now REQUIRES BTF (#46063; inline fallback #45626
     # was closed), so the durable fix is a BTF kernel (e.g. Ubuntu for Pi), not a
     # Cilium upgrade. 1.19.1 predates the change and keeps IPv6 LB + L2 working.
-    targetRevision: 1.19.1
+    targetRevision: 1.19.4
     helm:
       valuesObject:
         k8sServiceHost: 10.10.10.10
