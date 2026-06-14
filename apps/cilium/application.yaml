@@ -8,7 +8,16 @@ spec:
   source:
     chart: cilium
     repoURL: https://helm.cilium.io/
-    targetRevision: 1.19.4
+    # PINNED to 1.19.1 — do NOT bump on this node until it runs a BTF-enabled kernel.
+    # Cilium >=1.19.2 made the IPv6 SNAT helpers global BPF functions
+    # (cilium/cilium#44544, #45007); the verifier can only validate them with
+    # vmlinux BTF, which Raspberry Pi OS kernels don't ship (no CONFIG_DEBUG_INFO_BTF).
+    # Result on >=1.19.2: cilium_host fails to load tail_handle_snat_fwd_ipv6, the
+    # LoadBalancer/L2 datapath can't program, and Pi-hole's LB IP goes unreachable
+    # (cilium/cilium#45224). Cilium now REQUIRES BTF (#46063; inline fallback #45626
+    # was closed), so the durable fix is a BTF kernel (e.g. Ubuntu for Pi), not a
+    # Cilium upgrade. 1.19.1 predates the change and keeps IPv6 LB + L2 working.
+    targetRevision: 1.19.1
     helm:
       valuesObject:
         k8sServiceHost: 10.10.10.10
@@ -29,7 +38,7 @@ spec:
         bpf:
           # Belt-and-braces: the same BTF bug would also break the IPv6 SNAT
           # codepath if BPF masquerade were re-enabled. Iptables masquerade
-          # stays until raspberrypi/linux#6622 / cilium/cilium#45626 land.
+          # stays (same BTF bug, cilium/cilium#45224 — see the targetRevision pin above).
           masquerade: false
         kubeProxyReplacement: true
         socketLB:
