@@ -9,6 +9,11 @@
 			"description": "Schedule discord-bot updates between 3 AM and 8 PM",
 			"matchPackageNames": ["discord-bot"],
 			"schedule": ["* 3-20 * * *"]
+		},
+		{
+			"description": "Hold Cilium below 1.19.2: >=1.19.2 makes the IPv6 SNAT helpers global BPF functions that need vmlinux BTF, which the Raspberry Pi OS kernel lacks — breaks the LB/L2 datapath (cilium/cilium#45224). Unpin once the node runs a BTF-enabled kernel. See apps/cilium/application.yaml.",
+			"matchPackageNames": ["cilium"],
+			"allowedVersions": "<1.19.2"
 		}
 	],
 	"ignoreTests": true
