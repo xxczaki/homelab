@@ -19,6 +19,7 @@ declare -A secret_map=(
   [traces-grafana-k8s-monitoring-secret.yaml]="apps/k8s-monitoring/traces-secret.yaml"
   [longhorn-backblaze-b2-secret.yaml]="apps/longhorn/backblaze-b2-secret.yaml"
   [tailscale-operator-oauth-secret.yaml]="apps/tailscale/oauth-secret.yaml"
+  [oncall-heartbeat-secret.yaml]="apps/heartbeat/resources/sealed-secret.yaml"
 )
 
 for path in secrets/*.yaml; do

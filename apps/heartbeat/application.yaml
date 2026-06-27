@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: heartbeat
+  namespace: monitoring
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/xxczaki/homelab
+    path: apps/heartbeat/resources
+    targetRevision: HEAD
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
