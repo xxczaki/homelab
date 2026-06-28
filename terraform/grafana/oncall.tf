@@ -48,3 +48,17 @@ resource "grafana_oncall_route" "critical" {
   routing_regex       = "\"severity\": \"critical\""
   position            = 0
 }
+
+# --- Heartbeat: dead man's switch ---
+#
+# An in-cluster CronJob pings this integration's heartbeat URL; OnCall fires
+# through the critical chain when the pings stop. The interval and ping URL are
+# configured in the OnCall UI (the provider exposes neither).
+resource "grafana_oncall_integration" "heartbeat" {
+  name = "Cluster Heartbeat"
+  type = "webhook"
+
+  default_route {
+    escalation_chain_id = grafana_oncall_escalation_chain.critical.id
+  }
+}
