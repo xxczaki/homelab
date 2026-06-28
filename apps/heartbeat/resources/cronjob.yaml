@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: oncall-heartbeat
+  namespace: monitoring
+spec:
+  # Ping every 2 minutes. The OnCall heartbeat interval (set in the UI) should be
+  # higher (e.g. 10m) so a single missed ping from a transient blip does not page,
+  # but a real outage pages within minutes.
+  schedule: "*/2 * * * *"
+  timeZone: Europe/Berlin
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 60
+      ttlSecondsAfterFinished: 600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          # No tolerations on purpose: if the node is cordoned, these pods must
+          # stay Pending and fail to ping, so OnCall pages. The silence is the alarm.
+          containers:
+            - name: curl
+              image: curlimages/curl:8.11.1
+              command:
+                - sh
+                - -c
+                - 'curl -fsS --retry 3 --retry-delay 5 --max-time 30 -o /dev/null "$HEARTBEAT_URL"'
+              env:
+                - name: HEARTBEAT_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: oncall-heartbeat
+                      key: url
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault
