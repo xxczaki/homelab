@@ -101,7 +101,7 @@ resource "grafana_rule_group" "pod_health" {
       model = jsonencode({
         refId         = "A"
         datasource    = { type = "prometheus", uid = local.prom_ds_uid }
-        expr          = "increase(kube_pod_container_status_restarts_total[1h])"
+        expr          = "count by (namespace) (increase(kube_pod_container_status_restarts_total[1h]) > 5)"
         instant       = true
         range         = false
         intervalMs    = 1000
@@ -135,12 +135,12 @@ resource "grafana_rule_group" "pod_health" {
         type       = "threshold"
         expression = "B"
         datasource = { type = "__expr__", uid = "__expr__" }
-        conditions = [{ evaluator = { type = "gt", params = [5] } }]
+        conditions = [{ evaluator = { type = "gt", params = [0] } }]
       })
     }
 
     labels         = { severity = "warning" }
-    annotations    = { summary = "Pod {{ $labels.namespace }}/{{ $labels.pod }} restarted {{ humanize $values.B.Value }} times in the last hour" }
+    annotations    = { summary = "{{ humanize $values.B.Value }} pod(s) in namespace {{ $labels.namespace }} restarted more than 5 times in the last hour" }
     no_data_state  = "OK"
     exec_err_state = "Error"
   }
@@ -509,5 +509,75 @@ resource "grafana_rule_group" "storage" {
     annotations    = { summary = "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is {{ humanize $values.B.Value }}% full" }
     no_data_state  = "OK"
     exec_err_state = "Error"
+  }
+}
+
+# Watchdog: fires when the cluster stops shipping metrics. Unlike every rule
+# above (no_data_state = "OK", so they go silent when there is no data), this one
+# treats absence of data as the alarm. It complements the OnCall heartbeat: the
+# heartbeat catches the whole node/network going down, this catches the metrics
+# pipeline dying while the node is otherwise up (e.g. the scrape agent crashes).
+resource "grafana_rule_group" "watchdog" {
+  name             = "watchdog"
+  folder_uid       = grafana_folder.cluster_alerts.uid
+  interval_seconds = 60
+
+  rule {
+    name      = "MetricsPipelineDown"
+    condition = "C"
+    for       = "2m"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = local.prom_ds_uid
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+      model = jsonencode({
+        refId         = "A"
+        datasource    = { type = "prometheus", uid = local.prom_ds_uid }
+        expr          = "count(up)"
+        instant       = true
+        range         = false
+        intervalMs    = 1000
+        maxDataPoints = 43200
+      })
+    }
+    data {
+      ref_id         = "B"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 0
+        to   = 0
+      }
+      model = jsonencode({
+        refId      = "B"
+        type       = "reduce"
+        expression = "A"
+        reducer    = "last"
+        datasource = { type = "__expr__", uid = "__expr__" }
+      })
+    }
+    data {
+      ref_id         = "C"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 0
+        to   = 0
+      }
+      model = jsonencode({
+        refId      = "C"
+        type       = "threshold"
+        expression = "B"
+        datasource = { type = "__expr__", uid = "__expr__" }
+        conditions = [{ evaluator = { type = "lt", params = [1] } }]
+      })
+    }
+
+    labels         = { severity = "critical" }
+    annotations    = { summary = "No metrics are reaching Grafana Cloud – cluster observability is down" }
+    no_data_state  = "Alerting"
+    exec_err_state = "Alerting"
   }
 }
