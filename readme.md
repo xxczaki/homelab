@@ -31,7 +31,7 @@ Single-node [K3s](https://k3s.io) cluster managed entirely through [Argo CD](htt
 | [pi-hole](apps/pi-hole) | Helm | v2.38.0 |
 | [sealed-secrets](apps/sealed-secrets) | Helm | v2.20.0 |
 | [system-upgrade](apps/system-upgrade) | Git + Kustomize | v0.20.1 |
-| [tailscale](apps/tailscale) | Helm | v1.102.3 |
+| [tailscale](apps/tailscale) | Helm | v1.102.4 |
 <!-- AUTO-GENERATED:apps-table:END -->
 
 ## Project structure
