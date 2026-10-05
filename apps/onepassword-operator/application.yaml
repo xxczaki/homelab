@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: onepassword-operator
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    chart: connect
+    repoURL: https://1password.github.io/connect-helm-charts
+    targetRevision: 2.4.1
+    helm:
+      valuesObject:
+        connect:
+          create: false
+        operator:
+          create: true
+          authMethod: service-account
+          serviceAccountToken:
+            name: onepassword-service-account-token
+            key: token
+          watchNamespace:
+            - wicek
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: onepassword
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

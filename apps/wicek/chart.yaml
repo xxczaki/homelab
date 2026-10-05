@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.296
+    targetRevision: 0.1.297
     helm:
       valuesObject:
         secrets:
@@ -21,27 +21,12 @@ spec:
           ghToken:
             name: wicek-secrets
             key: GH_TOKEN
-          grafanaApiKey:
-            name: wicek-secrets
-            key: GRAFANA_API_KEY
-          haToken:
-            name: wicek-secrets
-            key: HA_TOKEN
           appleId:
             name: wicek-secrets
             key: APPLE_ID
           appleAppPassword:
             name: wicek-secrets
             key: APPLE_APP_PASSWORD
-          unifiUsername:
-            name: wicek-secrets
-            key: UNIFI_USERNAME
-          unifiPassword:
-            name: wicek-secrets
-            key: UNIFI_PASSWORD
-          haSSHKey:
-            name: wicek-ha-ssh-key
-            key: id_ed25519
           githubWebhookSecret:
             name: wicek-secrets
             key: GITHUB_WEBHOOK_SECRET
@@ -63,6 +48,41 @@ spec:
           storageClass: longhorn
         chromium:
           enabled: true
+        broker:
+          enabled: true
+          secrets:
+            - name: grafana-cloud
+              secretName: grafana-cloud
+            - name: home-assistant
+              secretName: home-assistant
+            - name: unifi
+              secretName: unifi
+            - name: home-assistant-ssh
+              secretName: home-assistant-ssh
+          routes:
+            - name: grafana
+              port: 8181
+              upstream: https://parsify.grafana.net
+              auth:
+                type: bearer
+                tokenFile: /run/broker/grafana-cloud/credential
+            - name: home-assistant
+              port: 8182
+              upstream: http://homeassistant.wicek.svc.cluster.local:8123
+              auth:
+                type: home-assistant
+                tokenFile: /run/broker/home-assistant/credential
+            - name: unifi
+              port: 8183
+              upstream: https://10.10.10.1
+              insecureTls: true
+              methods: [GET, POST]
+              auth:
+                type: unifi
+                usernameFile: /run/broker/unifi/username
+                passwordFile: /run/broker/unifi/password
+          sshKeys:
+            - /run/broker/home-assistant-ssh/private-key
         webhooks:
           service:
             enabled: true
