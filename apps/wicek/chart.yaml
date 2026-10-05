@@ -42,6 +42,14 @@ spec:
           haSSHKey:
             name: wicek-ha-ssh-key
             key: id_ed25519
+        ssh:
+          knownHosts: |
+            homeassistant.wicek.svc.cluster.local ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICKsBnZ2z0mLWXvv5Lw49EpfT8ycLZbURlKeM3x32e79
+            homeassistant.wicek.svc.cluster.local ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGVy/wM8DDh+iiZx6OBKUUxXNpK4qa4kpbA7biqNHQx88BZPtQ01QSSWzZGdRAaRSszyMI4P1qgjLcKp3lpRhi0=
+            homeassistant.wicek.svc.cluster.local ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4jHd6ZHB+fjG13wu7+jpYocD2EwR0VmRgezBCLaKv/fyUYyusyjO8SDBDAMx8IyKbGq0wMxpxZk1k0QM4kGxJknFo0atUCfpT7i4NdKJniQdC5EY/e4qj0vtKOnExfnQThydl9e4oVhD5hPfIgGjGfF7znRhKxDGo8Hqq7OyHptB/8b/RGIh9v0rUEnXe82qe3PdUHTlosu8On1bD6sKJjMcoTsDyTR4R11+/X+Ojrurmd0p8BlBmK6phLTnvGfl+XY7ceqePDapuq+vNDGtHBSTSR9L+FhfsUz0CQkSenerA2p3sh5qGIDYcKYK1LbKgAs8AGwGVa35cm7LCRpdh+toRnHXyybUeDB2g5zNfGKC/g3YXEhZnBqNMjRq7H61/dZ5bdsAQvo1iqIyEB9vpzm/c7Vf6NDuWJblr3X1qiJphMJOkasefif2VIYQH1lpvURHfpXdCFXu0bbxGIfftAmrlnuWyd/JdYmLiKqmxTTkZIHF0LEcswiLJQ+Jck+s=
+            raspberrypi.wicek.svc.cluster.local ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICdBq66LTw3mPbR+Popxqt43fYZo9fDaH/SQA5Osg8H
+            raspberrypi.wicek.svc.cluster.local ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEYw/dQ/aIaRfch2Qy59miJ6y705cmcxBLbbGmPOOE5B6H1+HHgFIuWFz/x3gq1E6dwWESiQbYyQcFj4X+NglTI=
+            raspberrypi.wicek.svc.cluster.local ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCyGDuE8n+rfcizeHSxG+1mMIl2Wh3nUjR178gddtnTtwwZTiYeqAuMxaCwgM6vFMKR4UxA7LgytPdWfAelHPuHehfRvbssIJoioS8JwaPTP7M+6l0v9GDSfAmL8DBTPGcH8iNMkqT/1pqk0lsJBq8MHO0MVBPPJXFsbnJfhh4+bMgNBzS7jKRJHIAoypnI5JARzBfugFU//s+o3FVEsDIbYRdqhaWo9tWHf7hK09tEDK4qHd0vz6uPQ3iCXKce2QER5LfLf88P9dnVYFHNKZVZQYgdt+fGGtHovFMQt64ra+RIvtpvT33XUsH8xB4XamGH/Aj94dEME+n8esPjiqLwsuPo9EPBV0j/3AsdxvX/blMR85+3qNapkPg7fKKQvowql8RLLqyn53gWF03Pg09eTAM6h1kGiZ9q63oVkRrq4OBQx6vBQp3iS8L5ymIQ4jJ81/wN1A/Qq/WGV/rG/5tVxW5TTCre2rD3PZFMs02eBEoNgzVtVygB2cXMepMDE7E=
         env:
           clientId: "1479530749354053833"
           allowedUserIds: "349213466743013376"
