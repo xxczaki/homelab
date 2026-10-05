@@ -111,8 +111,6 @@ spec:
                 passwordFile: /run/broker/icloud/password
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
-          placeholderEnv:
-            GH_TOKEN: injected-by-broker
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
