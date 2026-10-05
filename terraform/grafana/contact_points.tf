@@ -19,3 +19,14 @@ resource "grafana_contact_point" "discord" {
     EOT
   }
 }
+
+# Wicek triages newly firing alerts (cluster, Alloy, network) and DMs the findings.
+resource "grafana_contact_point" "wicek" {
+  name = "Wicek"
+
+  webhook {
+    url                       = "https://wicek-webhooks.tail12a84.ts.net/hooks/grafana"
+    authorization_scheme      = "Bearer"
+    authorization_credentials = var.wicek_webhook_token
+  }
+}

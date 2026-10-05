@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.297
+    targetRevision: 0.1.299
     helm:
       valuesObject:
         secrets:
@@ -39,6 +39,7 @@ spec:
           storageClass: longhorn
         chromium:
           enabled: true
+<<<<<<< HEAD
         broker:
           enabled: true
           secrets:
@@ -101,6 +102,15 @@ spec:
             HA_TOKEN: injected-by-broker
             APPLE_ID: injected-by-broker
             APPLE_APP_PASSWORD: injected-by-broker
+=======
+        webhooks:
+          service:
+            enabled: true
+          ingress:
+            enabled: true
+            hostname: wicek-webhooks
+            funnel: true
+>>>>>>> origin/main
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
