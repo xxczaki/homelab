@@ -42,6 +42,12 @@ spec:
           haSSHKey:
             name: wicek-ha-ssh-key
             key: id_ed25519
+          githubWebhookSecret:
+            name: wicek-secrets
+            key: GITHUB_WEBHOOK_SECRET
+          grafanaWebhookToken:
+            name: wicek-secrets
+            key: GRAFANA_WEBHOOK_TOKEN
         ssh:
           knownHosts: |
             homeassistant.wicek.svc.cluster.local ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICKsBnZ2z0mLWXvv5Lw49EpfT8ycLZbURlKeM3x32e79
@@ -57,6 +63,13 @@ spec:
           storageClass: longhorn
         chromium:
           enabled: true
+        webhooks:
+          service:
+            enabled: true
+          ingress:
+            enabled: true
+            hostname: wicek-hooks
+            funnel: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
