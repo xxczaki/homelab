@@ -59,10 +59,8 @@ spec:
               secretName: unifi
             - name: github
               secretName: github
-            - name: icloud-caldav
-              secretName: icloud-caldav
-            - name: icloud-mail
-              secretName: icloud-mail
+            - name: icloud
+              secretName: icloud
             - name: home-assistant-ssh
               secretName: home-assistant-ssh
           hosts:
@@ -102,15 +100,15 @@ spec:
             - host: "*.icloud.com"
               auth:
                 type: basic
-                usernameFile: /run/broker/icloud-caldav/username
-                passwordFile: /run/broker/icloud-caldav/password
+                usernameFile: /run/broker/icloud/username
+                passwordFile: /run/broker/icloud/password
             - host: imap.broker
               methods: [GET]
               auth:
                 type: imap
                 server: imap.mail.me.com
-                usernameFile: /run/broker/icloud-mail/username
-                passwordFile: /run/broker/icloud-mail/password
+                usernameFile: /run/broker/icloud/username
+                passwordFile: /run/broker/icloud/password
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
           placeholderEnv:
