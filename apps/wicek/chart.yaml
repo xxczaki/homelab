@@ -46,6 +46,8 @@ spec:
             enabled: true
             hostname: wicek-webhooks
             funnel: true
+        networkPolicy:
+          extraEgressPorts: [993]
         broker:
           enabled: true
           secrets:
@@ -59,6 +61,8 @@ spec:
               secretName: github
             - name: icloud-caldav
               secretName: icloud-caldav
+            - name: icloud-mail
+              secretName: icloud-mail
             - name: home-assistant-ssh
               secretName: home-assistant-ssh
           hosts:
@@ -100,6 +104,13 @@ spec:
                 type: basic
                 usernameFile: /run/broker/icloud-caldav/username
                 passwordFile: /run/broker/icloud-caldav/password
+            - host: imap.broker
+              methods: [GET]
+              auth:
+                type: imap
+                server: imap.mail.me.com
+                usernameFile: /run/broker/icloud-mail/username
+                passwordFile: /run/broker/icloud-mail/password
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
           placeholderEnv:
