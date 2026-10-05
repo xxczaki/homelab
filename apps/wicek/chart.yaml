@@ -113,10 +113,6 @@ spec:
             - /run/broker/home-assistant-ssh/private-key
           placeholderEnv:
             GH_TOKEN: injected-by-broker
-            GRAFANA_API_KEY: injected-by-broker
-            HA_TOKEN: injected-by-broker
-            APPLE_ID: injected-by-broker
-            APPLE_APP_PASSWORD: injected-by-broker
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
