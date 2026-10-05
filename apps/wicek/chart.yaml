@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.304
+    targetRevision: 0.1.307
     helm:
       valuesObject:
         secrets:
@@ -111,12 +111,6 @@ spec:
                 passwordFile: /run/broker/icloud/password
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
-          placeholderEnv:
-            GH_TOKEN: injected-by-broker
-            GRAFANA_API_KEY: injected-by-broker
-            HA_TOKEN: injected-by-broker
-            APPLE_ID: injected-by-broker
-            APPLE_APP_PASSWORD: injected-by-broker
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
