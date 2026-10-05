@@ -20,3 +20,9 @@ variable "discord_webhook_url" {
   type        = string
   sensitive   = true
 }
+
+variable "wicek_webhook_token" {
+  description = "Bearer token for the wicek /hooks/grafana webhook (GRAFANA_WEBHOOK_TOKEN)"
+  type        = string
+  sensitive   = true
+}

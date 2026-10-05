@@ -6,6 +6,12 @@ resource "grafana_notification_policy" "default" {
   group_interval  = "5m"
   repeat_interval = "4h"
 
+  # Catch-all copy to Wicek for triage; continue keeps the routes below intact.
+  policy {
+    contact_point = grafana_contact_point.wicek.name
+    continue      = true
+  }
+
   policy {
     matcher {
       label = "namespace"
