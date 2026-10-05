@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.296
+    targetRevision: 0.1.299
     helm:
       valuesObject:
         secrets:
@@ -18,30 +18,6 @@ spec:
           discordToken:
             name: wicek-secrets
             key: DISCORD_BOT_TOKEN
-          ghToken:
-            name: wicek-secrets
-            key: GH_TOKEN
-          grafanaApiKey:
-            name: wicek-secrets
-            key: GRAFANA_API_KEY
-          haToken:
-            name: wicek-secrets
-            key: HA_TOKEN
-          appleId:
-            name: wicek-secrets
-            key: APPLE_ID
-          appleAppPassword:
-            name: wicek-secrets
-            key: APPLE_APP_PASSWORD
-          unifiUsername:
-            name: wicek-secrets
-            key: UNIFI_USERNAME
-          unifiPassword:
-            name: wicek-secrets
-            key: UNIFI_PASSWORD
-          haSSHKey:
-            name: wicek-ha-ssh-key
-            key: id_ed25519
           githubWebhookSecret:
             name: wicek-secrets
             key: GITHUB_WEBHOOK_SECRET
@@ -70,6 +46,68 @@ spec:
             enabled: true
             hostname: wicek-webhooks
             funnel: true
+        broker:
+          enabled: true
+          secrets:
+            - name: grafana-cloud
+              secretName: grafana-cloud
+            - name: home-assistant
+              secretName: home-assistant
+            - name: unifi
+              secretName: unifi
+            - name: github
+              secretName: github
+            - name: icloud-caldav
+              secretName: icloud-caldav
+            - name: home-assistant-ssh
+              secretName: home-assistant-ssh
+          hosts:
+            - host: parsify.grafana.net
+              auth:
+                type: bearer
+                tokenFile: /run/broker/grafana-cloud/credential
+            - host: homeassistant.wicek.svc.cluster.local
+              auth:
+                type: home-assistant
+                tokenFile: /run/broker/home-assistant/credential
+            - host: 10.10.10.1
+              insecureTls: true
+              methods: [GET, POST]
+              auth:
+                type: unifi
+                usernameFile: /run/broker/unifi/username
+                passwordFile: /run/broker/unifi/password
+            - host: api.github.com
+              auth:
+                type: bearer
+                tokenFile: /run/broker/github/credential
+            - host: uploads.github.com
+              auth:
+                type: bearer
+                tokenFile: /run/broker/github/credential
+            - host: github.com
+              auth:
+                type: basic
+                username: x-access-token
+                passwordFile: /run/broker/github/credential
+            - host: gist.github.com
+              auth:
+                type: basic
+                username: x-access-token
+                passwordFile: /run/broker/github/credential
+            - host: "*.icloud.com"
+              auth:
+                type: basic
+                usernameFile: /run/broker/icloud-caldav/username
+                passwordFile: /run/broker/icloud-caldav/password
+          sshKeys:
+            - /run/broker/home-assistant-ssh/private-key
+          placeholderEnv:
+            GH_TOKEN: injected-by-broker
+            GRAFANA_API_KEY: injected-by-broker
+            HA_TOKEN: injected-by-broker
+            APPLE_ID: injected-by-broker
+            APPLE_APP_PASSWORD: injected-by-broker
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
