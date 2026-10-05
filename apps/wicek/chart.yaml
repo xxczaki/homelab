@@ -68,7 +68,7 @@ spec:
             enabled: true
           ingress:
             enabled: true
-            hostname: wicek-hooks
+            hostname: wicek-webhooks
             funnel: true
   destination:
     server: "https://kubernetes.default.svc"
