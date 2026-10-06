@@ -48,6 +48,43 @@ spec:
             funnel: true
         networkPolicy:
           extraEgressPorts: [993]
+        readers:
+          - name: bank
+            description: "The user's C24 bank accounts: balances and transactions (read-only). Also connects or renews the bank link."
+            prompt: |
+              # C24 bank accounts via Enable Banking
+
+              Read-only PSD2 access to the user's C24 accounts. Base URL https://api.enablebanking.com, JSON in and out.
+
+              ## Session
+
+              /state/session.json holds `{"session_id", "valid_until", "accounts": [{"uid", "iban", "name"}]}`. If it's missing or expired, or a call returns 401/403 or a consent error, connect:
+
+              1. `GET /aspsps?country=DE` and take the entry named `C24`. Its `maximum_consent_validity` is in seconds.
+              2. `POST /auth` with `{"access": {"valid_until": "<now + maximum_consent_validity, ISO 8601>"}, "aspsp": {"name": "C24", "country": "DE"}, "state": "<random UUID>", "redirect_url": "https://parsify.eu/", "psu_type": "personal"}`. Answer with the returned `url`: the user logs in there, then pastes the code (or the whole URL they land on) back to Wicek, who passes it to you.
+              3. When the question contains that code: `POST /sessions` with `{"code": "<code>"}`. Save `session_id`, `access.valid_until`, and each account's `uid`, `account_id.iban`, and `name` to /state/session.json, and confirm which accounts are connected.
+
+              If `valid_until` is within 7 days, mention it in every answer.
+
+              ## Data
+
+              - Balances: `GET /accounts/{uid}/balances`
+              - Transactions: `GET /accounts/{uid}/transactions?date_from=YYYY-MM-DD[&date_to=YYYY-MM-DD]`. Repeat with `&continuation_key=<key>` until the response has none.
+              - Transaction fields: `booking_date` (else `value_date`), `transaction_amount.amount` and `.currency`, `credit_debit_indicator` (`DBIT` money out, `CRDT` money in), `creditor.name` / `debtor.name`, `remittance_information[]`, `status` (`BOOK` booked, `PDNG` pending).
+
+              Banks allow only about 4 unattended calls per account per day. Fetch the whole range you need at once into /tmp/cache/<uid>-<today>.json and reuse it for the rest of the day. Never write transaction data under /state.
+
+              Do totals and grouping with jq, not by hand.
+            hosts:
+              - host: api.enablebanking.com
+                methods: [GET, POST]
+                auth:
+                  type: enable-banking
+                  applicationIdFile: /run/broker/enable-banking/username
+                  privateKeyFile: /run/broker/enable-banking/credential
+            secrets:
+              - name: enable-banking
+                secretName: enable-banking
         broker:
           enabled: true
           secrets:
@@ -63,8 +100,6 @@ spec:
               secretName: icloud
             - name: home-assistant-ssh
               secretName: home-assistant-ssh
-            - name: enable-banking
-              secretName: enable-banking
           hosts:
             - host: parsify.grafana.net
               auth:
@@ -104,12 +139,6 @@ spec:
                 type: basic
                 usernameFile: /run/broker/icloud/username
                 passwordFile: /run/broker/icloud/password
-            - host: api.enablebanking.com
-              methods: [GET, POST]
-              auth:
-                type: enable-banking
-                applicationIdFile: /run/broker/enable-banking/username
-                privateKeyFile: /run/broker/enable-banking/credential
             - host: imap.broker
               methods: [GET]
               auth:
