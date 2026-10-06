@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.310
+    targetRevision: 0.1.311
     helm:
       valuesObject:
         secrets:
@@ -63,6 +63,8 @@ spec:
               secretName: icloud
             - name: home-assistant-ssh
               secretName: home-assistant-ssh
+            - name: enable-banking
+              secretName: enable-banking
           hosts:
             - host: parsify.grafana.net
               auth:
@@ -102,6 +104,12 @@ spec:
                 type: basic
                 usernameFile: /run/broker/icloud/username
                 passwordFile: /run/broker/icloud/password
+            - host: api.enablebanking.com
+              methods: [GET, POST]
+              auth:
+                type: enable-banking
+                applicationIdFile: /run/broker/enable-banking/username
+                privateKeyFile: /run/broker/enable-banking/credential
             - host: imap.broker
               methods: [GET]
               auth:
