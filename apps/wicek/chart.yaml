@@ -8,7 +8,7 @@ spec:
   source:
     chart: wicek
     repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.313
+    targetRevision: 0.1.314
     helm:
       valuesObject:
         secrets:
@@ -48,6 +48,8 @@ spec:
             funnel: true
         networkPolicy:
           extraEgressPorts: [993]
+        readersDefaults:
+          callbackBaseUrl: https://wicek-webhooks.tail12a84.ts.net
         readers:
           - name: bank
             description: "The user's C24 bank accounts: balances and transactions (read-only). Also connects or renews the bank link."
@@ -61,8 +63,8 @@ spec:
               /state/session.json holds `{"session_id", "valid_until", "accounts": [{"uid", "iban", "name"}]}`. If it's missing or expired, or a call returns 401/403 or a consent error, connect:
 
               1. `GET /aspsps?country=DE` and take the entry named `C24`. Its `maximum_consent_validity` is in seconds.
-              2. `POST /auth` with `{"access": {"valid_until": "<now + maximum_consent_validity, ISO 8601>"}, "aspsp": {"name": "C24", "country": "DE"}, "state": "<random UUID>", "redirect_url": "https://parsify.eu/", "psu_type": "personal"}`. Answer with the returned `url`: the user logs in there, then pastes the code (or the whole URL they land on) back to Wicek, who passes it to you.
-              3. When the question contains that code: `POST /sessions` with `{"code": "<code>"}`. Save `session_id`, `access.valid_until`, and each account's `uid`, `account_id.iban`, and `name` to /state/session.json, and confirm which accounts are connected.
+              2. Create a random state and save it as described in your rules, then `POST /auth` with `{"access": {"valid_until": "<now + maximum_consent_validity, ISO 8601>"}, "aspsp": {"name": "C24", "country": "DE"}, "state": "<that state>", "redirect_url": "<your callback URL>", "psu_type": "personal"}`. Answer with the returned `url` and tell the user to open it and log in – the result arrives in Discord on its own.
+              3. When the redirect comes back with a `code`: `POST /sessions` with `{"code": "<code>"}`. Save `session_id`, `access.valid_until`, and each account's `uid`, `account_id.iban`, and `name` to /state/session.json, and confirm which accounts are connected. If it came back with an `error` instead, explain it.
 
               If `valid_until` is within 7 days, mention it in every answer.
 
