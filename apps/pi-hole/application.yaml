@@ -87,7 +87,7 @@ spec:
           TZ: "Europe/Warsaw"
           FTLCONF_dns_listeningMode: SINGLE
 
-        DNS1: 9.9.9.9  # Cloudflare drops ~25% of github.com queries from this ISP (2026-10-06)
+        DNS1: 9.9.9.9  # Cloudflare txl01 intermittently SERVFAILs github.com (EDE 22, 2026-10-06)
         DNS2: 2620:fe::fe
 
         dnsmasq:

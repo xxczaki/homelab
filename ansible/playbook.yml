@@ -14,8 +14,8 @@
 
     # --- Cluster DNS upstreams ---
     # CoreDNS forwards to the kubelet resolv.conf. The host one points at UniFi, which forwards to
-    # Cloudflare and turns its timeouts into SERVFAIL. Cloudflare drops ~25% of github.com queries
-    # from this ISP, so pods query Quad9 and Google directly (kubelet keeps at most 3 nameservers).
+    # Cloudflare. Cloudflare's txl01 PoP intermittently answers github.com with SERVFAIL (EDE 22,
+    # "No Reachable Authority"), so pods query Quad9 and Google directly (kubelet keeps at most 3).
     k3s_resolv_conf: /etc/rancher/k3s/resolv.conf
     k3s_upstream_nameservers:
       - "9.9.9.9"
