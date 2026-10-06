@@ -28,7 +28,7 @@ Single-node [K3s](https://k3s.io) cluster managed entirely through [Argo CD](htt
 | [heartbeat](apps/heartbeat) | Git | - |
 | [k8s-monitoring](apps/k8s-monitoring) | Helm | v4.5.2 |
 | [longhorn](apps/longhorn) | Helm | v1.13.0 |
-| [onepassword-operator](apps/onepassword-operator) | Helm | v2.4.1 |
+| [onepassword-operator](apps/onepassword-operator) | Helm | v2.4.2 |
 | [pi-hole](apps/pi-hole) | Helm | v2.38.0 |
 | [sealed-secrets](apps/sealed-secrets) | Helm | v2.20.0 |
 | [system-upgrade](apps/system-upgrade) | Git + Kustomize | v0.20.2 |
