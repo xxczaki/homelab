@@ -8,6 +8,7 @@ service-cidr:
 {% for cidr in k3s_service_cidrs %}
   - {{ cidr }}
 {% endfor %}
+resolv-conf: {{ k3s_resolv_conf }}
 flannel-backend: none
 disable-network-policy: true
 disable-kube-proxy: true
