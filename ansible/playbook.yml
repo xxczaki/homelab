@@ -12,6 +12,16 @@
       - "10.43.0.0/16"
       - "2001:cafe:43::/112"
 
+    # --- Cluster DNS upstreams ---
+    # CoreDNS forwards to the kubelet resolv.conf. The host one points at UniFi, which forwards to
+    # Cloudflare and turns its timeouts into SERVFAIL. Cloudflare drops ~25% of github.com queries
+    # from this ISP, so pods query Quad9 and Google directly (kubelet keeps at most 3 nameservers).
+    k3s_resolv_conf: /etc/rancher/k3s/resolv.conf
+    k3s_upstream_nameservers:
+      - "9.9.9.9"
+      - "2620:fe::fe"
+      - "8.8.8.8"
+
     # --- API Server ---
     k3s_apiserver_args:
       - "enable-admission-plugins=NodeRestriction"
@@ -70,11 +80,22 @@
         mode: "0755"
 
     - name: Deploy K3s config
+      tags: dns
       ansible.builtin.template:
         src: templates/k3s-config.yaml.j2
         dest: /etc/rancher/k3s/config.yaml
         mode: "0644"
       notify: restart K3s
+
+    - name: Deploy cluster DNS resolv.conf
+      tags: dns
+      ansible.builtin.template:
+        src: templates/k3s-resolv.conf.j2
+        dest: "{{ k3s_resolv_conf }}"
+        mode: "0644"
+      notify:
+        - restart K3s
+        - restart CoreDNS
 
     - name: Deploy Pod Security Admission config
       ansible.builtin.template:
@@ -187,6 +208,15 @@
       ansible.builtin.systemd:
         name: k3s
         state: restarted
+
+    - name: restart CoreDNS
+      ansible.builtin.command:
+        cmd: k3s kubectl -n kube-system rollout restart deployment/coredns
+      register: coredns_restart
+      until: coredns_restart.rc == 0
+      retries: 12
+      delay: 10
+      changed_when: true
 
     - name: reload sysctl
       ansible.builtin.command:
