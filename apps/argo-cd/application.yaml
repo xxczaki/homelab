@@ -34,12 +34,10 @@ spec:
               memory: 1Gi
 
         dex:
-          resources:
-            requests:
-              cpu: 10m
-              memory: 32Mi
-            limits:
-              memory: 128Mi
+          enabled: false
+
+        applicationSet:
+          replicas: 0
 
         redis:
           resources:
@@ -58,12 +56,7 @@ spec:
               memory: 512Mi
 
         notifications:
-          resources:
-            requests:
-              cpu: 10m
-              memory: 32Mi
-            limits:
-              memory: 128Mi
+          enabled: false
 
         server:
           resources:
