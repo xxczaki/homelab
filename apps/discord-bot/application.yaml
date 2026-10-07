@@ -38,6 +38,7 @@ spec:
 
         persistentVolumeClaim:
           storageClass: longhorn
+          size: 20Gi
 
         redis:
           architecture: standalone
