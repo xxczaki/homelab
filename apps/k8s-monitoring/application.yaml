@@ -54,7 +54,6 @@ spec:
             namespacesDenylist:
               - monitoring
               - kube-system
-              - longhorn-system
           cadvisor:
             metricsTuning:
               dropEmptyContainerLabels: true
@@ -62,7 +61,7 @@ spec:
               excludeNamespaces:
                 - monitoring
                 - kube-system
-                - longhorn-system
+                - longhorn
         prometheusOperatorObjects:
           enabled: true
           collector: alloy-singleton
@@ -72,7 +71,7 @@ spec:
           excludeNamespaces:
             - monitoring
             - kube-system
-            - longhorn-system
+            - longhorn
         nodeLogs:
           enabled: true
           collector: alloy-logs
@@ -82,7 +81,7 @@ spec:
           excludeNamespaces:
             - monitoring
             - kube-system
-            - longhorn-system
+            - longhorn
         hostMetrics:
           enabled: true
           collector: alloy-metrics
