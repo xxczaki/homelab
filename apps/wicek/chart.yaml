@@ -52,7 +52,7 @@ spec:
           callbackBaseUrl: https://wicek-webhooks.tail12a84.ts.net
         readers:
           - name: bank
-            description: "The user's C24 bank accounts: balances and transactions (read-only). Also connects or renews the bank link."
+            description: "The user's C24 bank accounts: balances and transactions (read-only). Ask it first about spending, costs, and balances. Also connects or renews the bank link."
             prompt: |
               # C24 bank accounts via Enable Banking
 
