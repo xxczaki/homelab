@@ -28,6 +28,12 @@
       - "image-gc-high-threshold=60"
       - "image-gc-low-threshold=40"
 
+    # --- K3s process environment ---
+    # GOGC=50 runs the Go GC at 1.5x live heap instead of 2x, so the k3s
+    # server holds ~800 MB instead of ~1.2 GB for a ~550 MB live heap.
+    k3s_env:
+      GOGC: "50"
+
     # --- Pod Security Admission ---
     psa_default_level: "restricted"
     psa_exempt_namespaces:
@@ -74,6 +80,14 @@
         src: templates/k3s-config.yaml.j2
         dest: /etc/rancher/k3s/config.yaml
         mode: "0644"
+      notify: restart K3s
+
+    - name: Deploy K3s environment
+      tags: k3s
+      ansible.builtin.template:
+        src: templates/k3s.service.env.j2
+        dest: /etc/systemd/system/k3s.service.env
+        mode: "0600"
       notify: restart K3s
 
     - name: Deploy Pod Security Admission config
