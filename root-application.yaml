@@ -30,4 +30,5 @@ spec:
         - /spec/externalName
   syncPolicy:
     automated:
+      prune: true
       selfHeal: true
