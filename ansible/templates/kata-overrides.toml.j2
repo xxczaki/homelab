@@ -2,3 +2,11 @@
 [hypervisor.qemu]
 enable_annotations = []
 default_memory = {{ kata_default_memory_mb }}
+# Free page reporting through the balloon device, so memory the guest frees
+# goes back to the host instead of staying resident in QEMU
+reclaim_guest_freed_memory = true
+
+[agent.kata.mem_agent]
+# Ages and evicts cold guest page cache, which free page reporting then
+# returns to the host
+mem_agent_enable = true

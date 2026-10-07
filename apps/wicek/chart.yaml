@@ -49,6 +49,7 @@ spec:
         networkPolicy:
           extraEgressPorts: [993]
         readersDefaults:
+          memory: 512Mi
           callbackBaseUrl: https://wicek-webhooks.tail12a84.ts.net
         readers:
           - name: bank
