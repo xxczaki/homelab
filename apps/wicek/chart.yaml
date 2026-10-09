@@ -103,6 +103,8 @@ spec:
               secretName: icloud
             - name: home-assistant-ssh
               secretName: home-assistant-ssh
+            - name: wicek-logins
+              secretName: wicek-logins
           hosts:
             - host: parsify.grafana.net
               auth:
@@ -149,6 +151,15 @@ spec:
                 server: imap.mail.me.com
                 usernameFile: /run/broker/icloud/username
                 passwordFile: /run/broker/icloud/password
+            - host: logins.broker
+              methods: [GET]
+              auth:
+                type: logins
+                vault: Wicek Logins
+                tokenFile: /run/broker/wicek-logins/credential
+                mailServer: imap.mail.me.com
+                mailUsernameFile: /run/broker/icloud/username
+                mailPasswordFile: /run/broker/icloud/password
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
   destination:
