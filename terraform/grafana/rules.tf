@@ -160,7 +160,7 @@ resource "grafana_rule_group" "pod_health" {
       model = jsonencode({
         refId         = "A"
         datasource    = { type = "prometheus", uid = local.prom_ds_uid }
-        expr          = "min_over_time(kube_pod_status_ready{condition=\"true\"}[15m])"
+        expr          = "kube_pod_status_ready{condition=\"true\"} unless on(namespace, pod) (kube_pod_status_phase{phase=\"Succeeded\"} == 1)"
         instant       = true
         range         = false
         intervalMs    = 1000
