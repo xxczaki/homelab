@@ -1,0 +1,121 @@
+# Restarts the operator when its embedded 1Password SDK wedges.
+#
+# After ~20 failed HTTP requests (DNS blip, network outage), the SDK's WASM core
+# leaks its stack and every later call fails with "wasm error: out of bounds
+# memory access" until the process restarts. The operator's /healthz is a plain
+# ping, so the liveness probe never notices. Existing secrets stay in place, but
+# nothing refreshes and new OnePasswordItems never sync.
+#
+# Upstream: https://github.com/1Password/onepassword-sdk-go/issues/288
+# and https://github.com/extism/go-sdk/issues/102. Remove this once the
+# operator ships an SDK with a fix.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: operator-watchdog
+  namespace: onepassword
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: operator-watchdog
+  namespace: onepassword
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: ["onepassword-connect-operator"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: operator-watchdog
+  namespace: onepassword
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: operator-watchdog
+subjects:
+  - kind: ServiceAccount
+    name: operator-watchdog
+    namespace: onepassword
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: onepassword-operator-watchdog
+  namespace: wicek
+rules:
+  - apiGroups: ["onepassword.com"]
+    resources: ["onepassworditems"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: onepassword-operator-watchdog
+  namespace: wicek
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: onepassword-operator-watchdog
+subjects:
+  - kind: ServiceAccount
+    name: operator-watchdog
+    namespace: onepassword
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: operator-watchdog
+  namespace: onepassword
+spec:
+  schedule: "*/15 * * * *"
+  timeZone: Europe/Berlin
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 120
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          serviceAccountName: operator-watchdog
+          containers:
+            - name: kubectl
+              image: alpine/k8s:1.36.5
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+                  messages=$(kubectl get onepassworditems -n wicek -o jsonpath='{range .items[*]}{.metadata.name}{": "}{.status.conditions[?(@.type=="Ready")].message}{"\n"}{end}')
+                  wedged=$(echo "$messages" | grep 'out of bounds memory access' || true)
+                  if [ -n "$wedged" ]; then
+                    echo "1Password SDK is wedged, restarting the operator. Affected items:"
+                    echo "$wedged" | cut -d: -f1
+                    kubectl -n onepassword rollout restart deployment/onepassword-connect-operator
+                  else
+                    echo "All OnePasswordItems are healthy"
+                  fi
+              env:
+                - name: HOME
+                  value: /tmp
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                runAsNonRoot: true
+                runAsUser: 1000
+                runAsGroup: 1000
+                seccompProfile:
+                  type: RuntimeDefault
+          restartPolicy: OnFailure
