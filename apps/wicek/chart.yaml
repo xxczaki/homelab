@@ -39,6 +39,10 @@ spec:
           storageClass: longhorn
         chromium:
           enabled: true
+        telemetry:
+          enabled: true
+          endpoint: http://grafana-k8s-monitoring-alloy-singleton.monitoring.svc.cluster.local:4318
+          logToolDetails: true
         webhooks:
           service:
             enabled: true

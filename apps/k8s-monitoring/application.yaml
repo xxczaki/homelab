@@ -62,6 +62,13 @@ spec:
                 - monitoring
                 - kube-system
                 - longhorn
+        applicationObservability:
+          enabled: true
+          collector: alloy-singleton
+          receivers:
+            otlp:
+              http:
+                enabled: true
         prometheusOperatorObjects:
           enabled: true
           collector: alloy-singleton
