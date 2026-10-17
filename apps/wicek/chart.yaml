@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    chart: wicek
-    repoURL: https://xxczaki.github.io/charts/
-    targetRevision: 0.1.351
+    repoURL: https://github.com/xxczaki/wicek.git
+    path: deploy/chart
+    targetRevision: c34965e6fdeb1f9445bd9bb6aa144f89c8563728
     helm:
       valuesObject:
         secrets:
@@ -166,6 +166,8 @@ spec:
                 mailPasswordFile: /run/broker/icloud/password
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
+        image:
+          tag: c34965e6fdeb1f9445bd9bb6aa144f89c8563728
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
