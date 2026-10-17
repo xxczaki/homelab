@@ -16,6 +16,9 @@ spec:
         operator:
           create: true
           authMethod: service-account
+          # The 1Password account allows 1,000 reads a day across all service accounts.
+          # The default 600 s poll costs 144 reads per item a day, which ran it out at 9 items.
+          pollingInterval: 3600
           serviceAccountToken:
             name: onepassword-service-account-token
             key: token
