@@ -140,11 +140,6 @@ spec:
                 type: basic
                 username: x-access-token
                 passwordFile: /run/broker/github/credential
-            - host: gist.github.com
-              auth:
-                type: basic
-                username: x-access-token
-                passwordFile: /run/broker/github/credential
             - host: "*.icloud.com"
               auth:
                 type: basic
