@@ -109,6 +109,8 @@ spec:
               secretName: home-assistant-ssh
             - name: wicek-logins
               secretName: wicek-logins
+            - name: google-budget
+              secretName: google-budget
           hosts:
             - host: parsify.grafana.net
               auth:
@@ -148,6 +150,16 @@ spec:
                 type: basic
                 usernameFile: /run/broker/icloud/username
                 passwordFile: /run/broker/icloud/password
+            - host: sheets.googleapis.com
+              paths:
+                - /v4/spreadsheets/1YLMFgg_fBi-t_tg0g4fZW4AKvX8LB-yeCjA4O77W2k8
+                - /v4/spreadsheets/1YLMFgg_fBi-t_tg0g4fZW4AKvX8LB-yeCjA4O77W2k8/*
+                - /v4/spreadsheets/1YLMFgg_fBi-t_tg0g4fZW4AKvX8LB-yeCjA4O77W2k8:*
+              auth:
+                type: google-service-account
+                keyFile: /run/broker/google-budget/credential
+                scopes:
+                  - https://www.googleapis.com/auth/spreadsheets
             - host: imap.broker
               methods: [GET]
               auth:
