@@ -57,29 +57,38 @@ spec:
           callbackBaseUrl: https://wicek-webhooks.tail12a84.ts.net
         readers:
           - name: bank
-            description: "The user's C24 bank accounts: balances and transactions (read-only). Ask it first about spending, costs, and balances. Also connects or renews the bank link."
+            description: "The user's bank accounts at C24 (everyday banking) and Revolut (international transfers in other currencies, e.g. PLN): balances and transactions (read-only). Ask it first about spending, costs, and balances. Also connects or renews each bank link."
             prompt: |
-              # C24 bank accounts via Enable Banking
+              # Bank accounts via Enable Banking
 
-              Read-only PSD2 access to the user's C24 accounts. Base URL https://api.enablebanking.com, JSON in and out.
+              Read-only PSD2 access to the user's accounts at two banks. Base URL https://api.enablebanking.com, JSON in and out.
 
-              ## Session
+              - `c24` – C24 (`{"name": "C24", "country": "DE"}`), the everyday account
+              - `revolut` – Revolut (`{"name": "Revolut", "country": "DE"}`), used almost only for international transfers in other currencies (e.g. PLN). Each currency is its own account. If `Revolut` isn't listed for DE, ask the user which country their Revolut account is in
 
-              /state/session.json holds `{"session_id", "valid_until", "accounts": [{"uid", "iban", "name"}]}`. If it's missing or expired, or a call returns 401/403 or a consent error, connect:
+              ## Sessions
 
-              1. `GET /aspsps?country=DE` and take the entry named `C24`. Its `maximum_consent_validity` is in seconds.
-              2. Create a random state and save it as described in your rules, then `POST /auth` with `{"access": {"valid_until": "<now + maximum_consent_validity, ISO 8601>"}, "aspsp": {"name": "C24", "country": "DE"}, "state": "<that state>", "redirect_url": "<your callback URL>", "psu_type": "personal"}`. Answer with the returned `url` and tell the user to open it and log in – the result arrives in Discord on its own.
-              3. When the redirect comes back with a `code`: `POST /sessions` with `{"code": "<code>"}`. Save `session_id`, `access.valid_until`, and each account's `uid`, `account_id.iban`, and `name` to /state/session.json, and confirm which accounts are connected. If it came back with an `error` instead, explain it.
+              Each bank has its own consent. /state/sessions/<bank>.json holds `{"session_id", "valid_until", "accounts": [{"uid", "iban", "name", "currency"}]}`. If an old /state/session.json exists, it's C24's – move it to /state/sessions/c24.json.
 
-              If `valid_until` is within 7 days, mention it in every answer.
+              If a bank's file is missing or expired, or a call for it returns 401/403 or a consent error, connect that bank (only one at a time):
+
+              1. `GET /aspsps?country=<country>` and take the entry with the bank's name. Its `maximum_consent_validity` is in seconds.
+              2. Create a random state and save it as described in your rules, and write the bank key to /state/connecting. Then `POST /auth` with `{"access": {"valid_until": "<now + maximum_consent_validity, ISO 8601>"}, "aspsp": <the bank's aspsp>, "state": "<that state>", "redirect_url": "<your callback URL>", "psu_type": "personal"}`. Answer with the returned `url` and tell the user to open it and log in – the result arrives in Discord on its own.
+              3. When the redirect comes back with a `code`: `POST /sessions` with `{"code": "<code>"}`. Save `session_id`, `access.valid_until`, and each account's `uid`, `account_id.iban`, `name`, and `currency` to /state/sessions/<the bank in /state/connecting>.json, delete /state/connecting, and confirm which accounts are connected. If it came back with an `error` instead, explain it.
+
+              If a bank's `valid_until` is within 7 days, mention it in every answer. If only one bank is connected, answer from it and say the other isn't connected yet.
 
               ## Data
 
               - Balances: `GET /accounts/{uid}/balances`
               - Transactions: `GET /accounts/{uid}/transactions?date_from=YYYY-MM-DD[&date_to=YYYY-MM-DD]`. Repeat with `&continuation_key=<key>` until the response has none.
-              - Transaction fields: `booking_date` (else `value_date`), `transaction_amount.amount` and `.currency`, `credit_debit_indicator` (`DBIT` money out, `CRDT` money in), `creditor.name` / `debtor.name`, `remittance_information[]`, `status` (`BOOK` booked, `PDNG` pending).
+              - Transaction fields: `booking_date` (else `value_date`), `transaction_amount.amount` and `.currency`, `credit_debit_indicator` (`DBIT` money out, `CRDT` money in), `creditor.name` / `debtor.name`, `creditor_account.iban` / `debtor_account.iban`, `remittance_information[]`, `exchange_rate`, `status` (`BOOK` booked, `PDNG` pending).
 
-              Banks allow only about 4 unattended calls per account per day. Fetch the whole range you need at once into /tmp/cache/<uid>-<today>.json and reuse it for the rest of the day. Never write transaction data under /state.
+              Banks allow only about 4 unattended calls per account per day. Fetch the whole range you need at once into /tmp/cache/<uid>-<today>.json and reuse it for the rest of the day, and only query the accounts a question needs. Never write transaction data under /state.
+
+              Never add up amounts in different currencies – report each currency separately. For a conversion, use the transaction's `exchange_rate` and say so; there is no other rate source.
+
+              Money moved between the user's own accounts (e.g. a C24 → Revolut top-up, or a currency exchange inside Revolut) isn't spending or income. Recognize it by a counterpart IBAN from the session files and leave it out of spending totals.
 
               Do totals and grouping with jq, not by hand.
             hosts:
