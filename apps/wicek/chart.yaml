@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/xxczaki/wicek.git
     path: deploy/chart
-    targetRevision: 9e9512f87ff6285e68a3ce17d01b31908c11023a
+    targetRevision: caa5129cc7d5bfa17c106e98a1fd3c59f09fe038
     helm:
       valuesObject:
         secrets:
@@ -183,7 +183,7 @@ spec:
           sshKeys:
             - /run/broker/home-assistant-ssh/private-key
         image:
-          tag: 9e9512f87ff6285e68a3ce17d01b31908c11023a
+          tag: caa5129cc7d5bfa17c106e98a1fd3c59f09fe038
   destination:
     server: "https://kubernetes.default.svc"
     namespace: wicek
