@@ -31,9 +31,7 @@ spec:
             key: mistralApiKey
         env:
           clientId: "767113441718435850"
-          playlistsChannelId: "1197942961695101090"
           botDebugChannelId: "1378037693094694922"
-          ownerRoleId: "1490074399632789624"
           guilds:
             "824396697558843432":
               playlistsChannelId: "1197942961695101090"
