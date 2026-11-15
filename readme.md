@@ -24,7 +24,7 @@ Single-node [K3s](https://k3s.io) cluster managed entirely through [Argo CD](htt
 |---|---|---|
 | [argo-cd](apps/argo-cd) | Helm | v10.18.0 |
 | [cilium](apps/cilium) | Helm | v1.19.1 |
-| [discord-bot](apps/discord-bot) | Git | v204c041bab2ec2c53918bbcb86df93cb0f6b4ee7 |
+| [discord-bot](apps/discord-bot) | Git | va9d24767a5000e69822a10ef55932fb7d6e4a47d |
 | [heartbeat](apps/heartbeat) | Git | - |
 | [k8s-monitoring](apps/k8s-monitoring) | Helm | v4.6.1 |
 | [longhorn](apps/longhorn) | Helm | v1.13.0 |
