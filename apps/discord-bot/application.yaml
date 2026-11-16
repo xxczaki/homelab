@@ -8,11 +8,11 @@ spec:
   source:
     repoURL: https://github.com/xxczaki/discord-bot.git
     path: deploy/chart
-    targetRevision: a9d24767a5000e69822a10ef55932fb7d6e4a47d
+    targetRevision: 2de166557268588ac838aa45e9669316b24ef467
     helm:
       valuesObject:
         image:
-          tag: a9d24767a5000e69822a10ef55932fb7d6e4a47d
+          tag: 2de166557268588ac838aa45e9669316b24ef467
         secrets:
           token:
             name: secrets
