@@ -29,8 +29,9 @@ spec:
               value: /tmp
 ---
 # The node joins the tailnet once with a single-use, pre-authorized auth key
-# tagged tag:tsidp, created by hand as the `tsidp-authkey` Secret (not in git).
-# After that, its identity lives in the PVC and the key is never read again.
+# tagged tag:tsidp, from the `tsidp-authkey` SealedSecret (sealed-secret.yaml).
+# After that, its identity lives in the PVC and the expired key is never read
+# again; a new key is only needed if the PVC is lost.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
