@@ -110,8 +110,8 @@ spec:
               secretName: home-assistant
             - name: unifi
               secretName: unifi
-            - name: github
-              secretName: github
+            - name: github-app
+              secretName: github-app
             - name: icloud
               secretName: icloud
             - name: home-assistant-ssh
@@ -138,17 +138,23 @@ spec:
                 passwordFile: /run/broker/unifi/password
             - host: api.github.com
               auth:
-                type: bearer
-                tokenFile: /run/broker/github/credential
+                type: github-app
+                clientIdFile: /run/broker/github-app/client-id
+                installationIdFile: /run/broker/github-app/installation-id
+                privateKeyFile: /run/broker/github-app/private-key
             - host: uploads.github.com
               auth:
-                type: bearer
-                tokenFile: /run/broker/github/credential
+                type: github-app
+                clientIdFile: /run/broker/github-app/client-id
+                installationIdFile: /run/broker/github-app/installation-id
+                privateKeyFile: /run/broker/github-app/private-key
             - host: github.com
               auth:
-                type: basic
-                username: x-access-token
-                passwordFile: /run/broker/github/credential
+                type: github-app
+                clientIdFile: /run/broker/github-app/client-id
+                installationIdFile: /run/broker/github-app/installation-id
+                privateKeyFile: /run/broker/github-app/private-key
+                scheme: basic
             - host: "*.icloud.com"
               auth:
                 type: basic
