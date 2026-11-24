@@ -69,3 +69,8 @@ spec:
     automated:
       prune: true
       selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        policy.sigstore.dev/include: "true"
