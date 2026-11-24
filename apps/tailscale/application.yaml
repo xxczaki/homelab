@@ -9,6 +9,10 @@ spec:
     chart: tailscale-operator
     repoURL: https://pkgs.tailscale.com/helmcharts
     targetRevision: 1.104.7
+    helm:
+      valuesObject:
+        apiServerProxyConfig:
+          mode: "true"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: tailscale

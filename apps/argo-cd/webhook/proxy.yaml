@@ -1,0 +1,153 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webhook-proxy
+  namespace: argo-cd
+data:
+  # GitHub webhook source ranges from the `hooks` key of https://api.github.com/meta
+  github-hooks.conf: |
+    allow 9.234.106.48/28;
+    allow 9.234.98.160/28;
+    allow 9.234.98.176/28;
+    allow 192.30.252.0/22;
+    allow 185.199.108.0/22;
+    allow 140.82.112.0/20;
+    allow 143.55.64.0/20;
+    allow 2a0a:a440::/29;
+    allow 2606:50c0::/32;
+    deny all;
+  default.conf: |
+    set_real_ip_from 10.42.0.0/16;
+    set_real_ip_from 2001:cafe:42::/56;
+    real_ip_header X-Forwarded-For;
+
+    server {
+      listen 8080;
+      listen [::]:8080;
+      server_tokens off;
+      client_max_body_size 25m;
+
+      location = /api/webhook {
+        include /etc/nginx/conf.d/github-hooks.conf;
+        limit_except POST {
+          deny all;
+        }
+        proxy_pass http://argo-cd-argocd-server.argo-cd.svc.cluster.local:80;
+        proxy_set_header Host $host;
+      }
+
+      location / {
+        return 404;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-proxy
+  namespace: argo-cd
+  labels:
+    app.kubernetes.io/name: webhook-proxy
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webhook-proxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webhook-proxy
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: nginx
+          image: nginxinc/nginx-unprivileged:1.29.3-alpine
+          ports:
+            - name: http
+              containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          readinessProbe:
+            tcpSocket:
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/conf.d
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: webhook-proxy
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-proxy
+  namespace: argo-cd
+spec:
+  selector:
+    app.kubernetes.io/name: webhook-proxy
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: webhook-proxy
+  namespace: argo-cd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: webhook-proxy
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale
+      ports:
+        - port: 8080
+---
+# Public on the internet via Funnel, but only for /api/webhook
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argo-cd-webhook
+  namespace: argo-cd
+  annotations:
+    tailscale.com/funnel: "true"
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - argo-cd-hook
+  rules:
+    - http:
+        paths:
+          - path: /api/webhook
+            pathType: Prefix
+            backend:
+              service:
+                name: webhook-proxy
+                port:
+                  name: http

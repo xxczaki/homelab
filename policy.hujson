@@ -6,6 +6,7 @@
 		"tag:k8s":          ["tag:k8s-operator"],
 		"tag:ipv6-only":    [],
 		"tag:server":       ["autogroup:admin"],
+		"tag:tsidp":        ["autogroup:admin"],
 	},
 
 	"nodeAttrs": [
@@ -19,7 +20,7 @@
 			// Funnel policy, which lets tailnet members control Funnel
 			// for their own devices.
 			// Learn more at https://tailscale.com/kb/1223/tailscale-funnel/
-			"target": ["autogroup:member", "tag:k8s"],
+			"target": ["autogroup:member", "tag:k8s", "tag:tsidp"],
 			"attr":   ["funnel"],
 		},
 	],
@@ -27,6 +28,32 @@
 	"acls": [
 		// Allow all connections.
 		{"action": "accept", "src": ["*"], "dst": ["*:*"]},
+	],
+
+	"grants": [
+		// tsidp (OIDC provider at idp.tail12a84.ts.net): admins can manage
+		// clients, and get the `argocd-admins` group claim for Argo CD SSO.
+		{
+			"src": ["autogroup:admin"],
+			"dst": ["tag:tsidp"],
+			"app": {
+				"tailscale.com/cap/tsidp": [
+					{"allow_admin_ui": true, "allow_dcr": true},
+					{"extraClaims": {"groups": ["argocd-admins"]}, "includeInUserInfo": true},
+				],
+			},
+		},
+		// kubectl through the operator's API server proxy, bound to
+		// cluster-admin by apps/tailscale/api-server-rbac.yaml.
+		{
+			"src": ["autogroup:admin"],
+			"dst": ["tag:k8s-operator"],
+			"app": {
+				"tailscale.com/cap/kubernetes": [
+					{"impersonate": {"groups": ["tailnet-admins"]}},
+				],
+			},
+		},
 	],
 
 	"ssh": [

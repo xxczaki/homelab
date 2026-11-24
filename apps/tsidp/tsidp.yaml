@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tsidp
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+            - name: HOME
+              value: /tmp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tsidp-state
+  namespace: tsidp
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 256Mi
+  template:
+    spec:
+      containers:
+        - env:
+            - name: HOME
+              value: /tmp
+---
+# The node joins the tailnet once with a single-use, pre-authorized auth key
+# tagged tag:tsidp, from the `tsidp-authkey` SealedSecret (sealed-secret.yaml).
+# After that, its identity lives in the PVC and the expired key is never read
+# again; a new key is only needed if the PVC is lost.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsidp
+  namespace: tsidp
+  labels:
+    app.kubernetes.io/name: tsidp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tsidp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tsidp
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: tsidp
+          image: ghcr.io/tailscale/tsidp:v0.0.21
+          env:
+            - name: TAILSCALE_USE_WIP_CODE
+              value: "1"
+            - name: TS_STATE_DIR
+              value: /var/lib/tsidp
+            - name: TS_HOSTNAME
+              value: idp
+            - name: TSIDP_USE_FUNNEL
+              value: "1"
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: tsidp-authkey
+                  key: authkey
+                  optional: true
+            - name: HOME
+              value: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: state
+              mountPath: /var/lib/tsidp
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: tsidp-state
+        - name: tmp
+          emptyDir: {}
