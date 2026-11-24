@@ -23,9 +23,6 @@ spec:
           spotifyClientSecret:
             name: secrets
             key: spotifyClientSecret
-          openAiApiKey:
-            name: secrets
-            key: openAiApiKey
           mistralApiKey:
             name: secrets
             key: mistralApiKey
