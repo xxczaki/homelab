@@ -8,7 +8,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  mode: warn
+  mode: enforce
   images:
     - glob: "ghcr.io/xxczaki/discord-bot**"
   authorities:
