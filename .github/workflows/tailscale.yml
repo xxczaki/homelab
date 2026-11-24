@@ -3,24 +3,31 @@ name: Sync Tailscale ACLs
 on:
   push:
     branches: ["main"]
-    paths: ["policy.hujson"]
+    paths: ["policy.hujson", ".github/workflows/tailscale.yml"]
   pull_request:
     branches: ["main"]
-    paths: ["policy.hujson"]
+    paths: ["policy.hujson", ".github/workflows/tailscale.yml"]
   workflow_dispatch:
+
+permissions: {}
 
 jobs:
   tailscale:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Test ACL
         if: github.event_name == 'pull_request'
         uses: tailscale/gitops-acl-action@v1
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          oauth-client-id: ${{ vars.TS_WIF_TEST_CLIENT_ID }}
+          audience: ${{ vars.TS_WIF_TEST_AUDIENCE }}
           tailnet: ${{ secrets.TS_TAILNET }}
           action: test
 
@@ -28,7 +35,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: tailscale/gitops-acl-action@v1
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          oauth-client-id: ${{ vars.TS_WIF_APPLY_CLIENT_ID }}
+          audience: ${{ vars.TS_WIF_APPLY_AUDIENCE }}
           tailnet: ${{ secrets.TS_TAILNET }}
           action: apply
