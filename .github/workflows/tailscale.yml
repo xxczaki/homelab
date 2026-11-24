@@ -3,10 +3,10 @@ name: Sync Tailscale ACLs
 on:
   push:
     branches: ["main"]
-    paths: ["policy.hujson"]
+    paths: ["policy.hujson", ".github/workflows/tailscale.yml"]
   pull_request:
     branches: ["main"]
-    paths: ["policy.hujson"]
+    paths: ["policy.hujson", ".github/workflows/tailscale.yml"]
   workflow_dispatch:
 
 permissions: {}
