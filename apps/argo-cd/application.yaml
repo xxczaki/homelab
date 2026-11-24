@@ -70,8 +70,6 @@ spec:
           ingress:
             enabled: true
             ingressClassName: tailscale
-            annotations:
-              tailscale.com/funnel: "true"
             hostname: argo-cd
             hosts:
               - argo-cd
