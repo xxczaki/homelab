@@ -39,6 +39,20 @@ spec:
           storageClass: longhorn
         chromium:
           enabled: true
+        accountBrowser:
+          enabled: true
+          logins:
+            type: logins
+            vault: Wicek Logins
+            tokenFile: /run/broker/wicek-logins/credential
+            mailServer: imap.mail.me.com
+            mailUsernameFile: /run/broker/icloud/username
+            mailPasswordFile: /run/broker/icloud/password
+          secrets:
+            - name: wicek-logins
+              secretName: wicek-logins
+            - name: icloud
+              secretName: icloud
         telemetry:
           enabled: true
           endpoint: http://grafana-k8s-monitoring-alloy-singleton.monitoring.svc.cluster.local:4318
