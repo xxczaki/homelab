@@ -1,0 +1,26 @@
+# Only admit discord-bot images with GitHub artifact attestation provenance
+# built by ci.yml on main. Enforced in namespaces labeled
+# policy.sigstore.dev/include=true.
+apiVersion: policy.sigstore.dev/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: discord-bot
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  mode: enforce
+  images:
+    - glob: "ghcr.io/xxczaki/discord-bot**"
+  authorities:
+    - name: github-actions
+      keyless:
+        url: https://fulcio.sigstore.dev
+        identities:
+          - issuer: https://token.actions.githubusercontent.com
+            subject: https://github.com/xxczaki/discord-bot/.github/workflows/ci.yml@refs/heads/main
+      ctlog:
+        url: https://rekor.sigstore.dev
+      signatureFormat: bundle
+      attestations:
+        - name: provenance
+          predicateType: https://slsa.dev/provenance/v1

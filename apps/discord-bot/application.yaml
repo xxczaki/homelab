@@ -23,9 +23,6 @@ spec:
           spotifyClientSecret:
             name: secrets
             key: spotifyClientSecret
-          openAiApiKey:
-            name: secrets
-            key: openAiApiKey
           mistralApiKey:
             name: secrets
             key: mistralApiKey
@@ -69,3 +66,8 @@ spec:
     automated:
       prune: true
       selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        policy.sigstore.dev/include: "true"

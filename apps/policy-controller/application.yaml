@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: policy-controller
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    chart: policy-controller
+    repoURL: https://sigstore.github.io/helm-charts
+    targetRevision: 0.10.8
+    helm:
+      valuesObject:
+        webhook:
+          # Images without a matching ClusterImagePolicy (e.g. Redis) are allowed,
+          # images with one must pass it.
+          configData:
+            no-match-policy: allow
+          securityContext:
+            enabled: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: cosign-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
