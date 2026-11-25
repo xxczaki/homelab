@@ -2,13 +2,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: tsidp
-spec:
-  template:
-    spec:
-      containers:
-        - env:
-            - name: HOME
-              value: /tmp
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -21,12 +14,6 @@ spec:
   resources:
     requests:
       storage: 256Mi
-  template:
-    spec:
-      containers:
-        - env:
-            - name: HOME
-              value: /tmp
 ---
 # The node joins the tailnet once with a single-use, pre-authorized auth key
 # tagged tag:tsidp, from the `tsidp-authkey` SealedSecret (sealed-secret.yaml).
