@@ -51,9 +51,15 @@ spec:
           enabled: true
           collector: alloy-metrics
           kube-state-metrics:
-            namespacesDenylist:
-              - monitoring
-              - kube-system
+            # Grafana Cloud bills container hours off kube_pod_container_info.
+            # Drop it for system namespaces to stay within the free tier, but
+            # keep the other KSM metrics so pod health alerts still cover them.
+            extraMetricProcessingRules: |
+              rule {
+                source_labels = ["__name__", "namespace"]
+                regex         = "kube_pod_container_info;(kube-system|monitoring|longhorn)"
+                action        = "drop"
+              }
           cadvisor:
             metricsTuning:
               dropEmptyContainerLabels: true
