@@ -16,6 +16,11 @@
     k3s_apiserver_args:
       - "enable-admission-plugins=NodeRestriction"
       - "admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml"
+      # Public OIDC issuer for service account tokens (discovery docs on GitHub
+      # Pages, see oidc/). The trailing "-" makes k3s prepend it, so it signs
+      # new tokens while the in-cluster default issuer stays accepted.
+      - "service-account-issuer-=https://xxczaki.github.io/homelab"
+      - "service-account-jwks-uri=https://xxczaki.github.io/homelab/openid/v1/jwks.json"
 
     # --- Controller Manager ---
     k3s_controller_manager_args:
