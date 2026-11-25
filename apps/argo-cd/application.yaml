@@ -24,6 +24,8 @@ spec:
             createSecret: false
           cm:
             timeout.reconciliation: 0s
+            # Local admin is off; sign in with Tailscale (tsidp) SSO.
+            admin.enabled: "false"
             url: https://argo-cd.tail12a84.ts.net
             # SSO through tsidp (apps/tsidp). Admins get the argocd-admins
             # group claim from the tailscale.com/cap/tsidp grant in policy.hujson.
