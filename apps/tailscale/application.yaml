@@ -11,6 +11,13 @@ spec:
     targetRevision: 1.104.7
     helm:
       valuesObject:
+        # Workload identity federation: the operator exchanges a projected
+        # ServiceAccount token (issuer https://xxczaki.github.io/homelab, see
+        # oidc/) for short-lived Tailscale API tokens instead of using an
+        # OAuth client secret.
+        oauth:
+          clientId: TvcUD9N8ES11CNTRL-krkU4ikcgG11CNTRL
+          audience: api.tailscale.com/TvcUD9N8ES11CNTRL-krkU4ikcgG11CNTRL
         apiServerProxyConfig:
           mode: "true"
   destination:
