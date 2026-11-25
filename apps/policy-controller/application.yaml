@@ -31,7 +31,8 @@ spec:
   destination:
     server: "https://kubernetes.default.svc"
     namespace: cosign-system
-  # The controller injects caBundle and rules into its webhooks at runtime.
+  # The controller injects caBundle, rules and a knative exclude label
+  # selector into its webhooks at runtime.
   # Without this, selfHeal reverts them and briefly breaks admission.
   ignoreDifferences:
     - group: admissionregistration.k8s.io
@@ -39,11 +40,13 @@ spec:
       jqPathExpressions:
         - .webhooks[]?.clientConfig.caBundle
         - .webhooks[]?.rules
+        - .webhooks[]?.namespaceSelector
     - group: admissionregistration.k8s.io
       kind: ValidatingWebhookConfiguration
       jqPathExpressions:
         - .webhooks[]?.clientConfig.caBundle
         - .webhooks[]?.rules
+        - .webhooks[]?.namespaceSelector
   syncPolicy:
     automated:
       prune: true
