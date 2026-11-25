@@ -24,6 +24,23 @@ spec:
             createSecret: false
           cm:
             timeout.reconciliation: 0s
+            url: https://argo-cd.tail12a84.ts.net
+            # SSO through tsidp (apps/tsidp). Admins get the argocd-admins
+            # group claim from the tailscale.com/cap/tsidp grant in policy.hujson.
+            # tsidp tokens live 5 minutes, so refresh well before that.
+            oidc.config: |
+              name: Tailscale
+              issuer: https://idp.tail12a84.ts.net
+              clientID: 911e3e59c8dcc1dbe71088f7d607efd3
+              clientSecret: $oidc.tsidp.clientSecret
+              requestedScopes: ["openid", "profile", "email"]
+              enablePKCEAuthentication: true
+              refreshTokenThreshold: 60s
+          rbac:
+            policy.default: ""
+            scopes: "[groups, email]"
+            policy.csv: |
+              g, argocd-admins, role:admin
 
         controller:
           resources:
